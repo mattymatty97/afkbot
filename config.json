@@ -1,0 +1,12 @@
+{
+    "ports":{
+        "web":8080
+    },
+    "openBrowserOnStart": false,
+    "password":"",
+    "server": {
+        "ip": "protosky.apexmc.co",
+        "port": 25565
+    },
+    "reconnectTimeout": 3000
+}
