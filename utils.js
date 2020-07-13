@@ -20,7 +20,7 @@ const codes = {
         white: '#FFFFFF'
 }
 
-const oldCodes = {
+const MotdCodes = {
     color: {
         '0': 'black',
         '1': 'dark_blue',
@@ -92,44 +92,61 @@ module.exports = {
             }
             text = text.concat(tail)
         }
-        return module.exports.OldChatToHtml(text)
+        return module.exports.MotdToHtml(text)
     },
 
-    OldChatToHtml: (message) =>{
+    MotdToHtml: (message) =>{
         let list = message.split('§')
         let text = list[0]
         let color = null;
-        let tail = Queue()
-        let obfuscate = false;
+        let bold = false
+        let italic = false
+        let underline = false
+        let strike = false
+        let obfuscated = false
+        let tail = ""
+        let head = ""
         for (let i=1 ; i<list.length ; i++){
             let modifier = list[i][0]
             let msg = list[i].slice(1)
-            if( oldCodes.color[modifier] !== undefined ){
-                if (color !== oldCodes.color[modifier]){
-                    while(tail.length>0){
-                        text = text.concat(tail.pop())
+            if( MotdCodes.color[modifier] !== undefined ){
+                if (color !== MotdCodes.color[modifier]){
+                    let oldColor = color
+
+                    if(oldColor !== null){
+                        text = text.concat(tail)
                     }
-                    color = oldCodes.color[modifier]
+
+                    color = MotdCodes.color[modifier]
                     text = text.concat("<a style='color: ").concat(codes[color]).concat("'>")
-                    tail.push("</a>")
+
+                    if(oldColor !== null){
+                        text = text.concat(head)
+                    }else{
+                        tail = "</a>".concat(tail)
+                    }
                 }
             }else{
-                switch (oldCodes[modifier]) {
+                switch (MotdCodes[modifier]) {
                     case 'bold':
                         text = text.concat("<b>")
-                        tail.push("</b>")
+                        head = head.concat("<b>")
+                        tail = "</b>".concat(tail)
                         break;
                     case 'italic':
                         text = text.concat("<i>")
-                        tail.push("</i>")
+                        head = head.concat("<i>")
+                        tail = "</i>".concat(tail)
                         break;
                     case 'underline':
                         text = text.concat("<u>")
-                        tail.push("</u>")
+                        head = head.concat("<u>")
+                        tail = "</u>".concat(tail)
                         break;
                     case 'strike':
                         text = text.concat("<s>")
-                        tail.push("</s>")
+                        head = head.concat("<s>")
+                        tail = "</s>".concat(tail)
                         break;
                     case 'obfuscated':
                         /*if(!obfuscated) {
@@ -138,9 +155,10 @@ module.exports = {
                         }*/
                         break;
                     case 'reset':
-                        while(tail.length>0){
-                            text = text.concat(tail.pop())
-                        }
+                        text = text.concat(tail)
+                        color = null
+                        tail = ""
+                        head = ""
                         break;
                 }
             }
@@ -149,10 +167,10 @@ module.exports = {
         return text
     },
     escapeHtml: (msg) =>{
-        return msg.replace(/"/gi,"&quot")
-            .replace(/&/gi,"&amp")
-            .replace(/</gi,"&lt")
-            .replace(/>/gi,"&gt")
+        return msg.replace(/"/gi,"&quot;")
+            .replace(/&/gi,"&amp;")
+            .replace(/</gi,"&lt;")
+            .replace(/>/gi,"&gt;")
     }
 }
 
