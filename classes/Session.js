@@ -25,7 +25,8 @@ class Session{
             this.scoreboard = {};
             this.scoreboard["title"]=scoreboard.title
             this.scoreboard["entries"]={}
-            for (let item in scoreboard.items.slice(15) ) {
+            for (let i=0; i<scoreboard.items.length && i<15; i++ ) {
+                let item = scoreboard.items[i]
                 this.scoreboard["entries"][item.name]=item.value;
             }
         }else if(this.bot.scoreboard["list"] === scoreboard){

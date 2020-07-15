@@ -144,20 +144,22 @@ function updatePageComponents(req) {
         if (response.hasOwnProperty("scoreboard")) {
             let scoreboard = response.scoreboard
             let new_html = ""
+            let title = "SCOREBOARD"
             if (JSON.stringify(old_scoreboard) !== JSON.stringify(scoreboard)) {
                 if (JSON.stringify(scoreboard) === JSON.stringify({})) {
                     new_html = "<tr><td><a>Nothing to Show</a></td></tr>"
+                    title = "SCOREBOARD"
                 } else {
-                    new_html = new_html.concat("<th><a>").concat(scoreboard.title).concat("</a></th>")
+                    title = scoreboard.title
                     Object.keys(scoreboard.entries).forEach((key) => {
                         let value = scoreboard.entries[key]
-                        if (typeof (value) === "string" && typeof (key) === "string")
+                        if (typeof (value) === "number"  && typeof (key) === "string")
                             new_html = new_html.concat("<tr><td><a style='text-align: left'>").concat(key).concat("</a></td>")
-                                .concat("<a style='text-align: right'>").concat(value).concat("</a></td></tr>")
+                                .concat("<td><a style='text-align: right; color: #f32727'>").concat(value).concat("</a></td></tr>")
                     })
                 }
-                let element = document.getElementsByClassName("scoreboard_content")[0]
-                element.innerHTML = new_html;
+                document.getElementsByClassName("scoreboard_content")[0].innerHTML = new_html;
+                document.getElementById("scoreboard_title").innerHTML = title;
                 old_scoreboard = scoreboard
             }
         }
