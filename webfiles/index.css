@@ -17,62 +17,17 @@ body {
     /*border: 1px solid red;*/
 }
 
-.sub_table {
-    padding: 0;
-    border-spacing: 0;
-}
-
-.sub_table td {
-    padding: 0;
-    border-spacing: 0;
-}
-
-.tab_list {
-    text-align: center;
-}
-
-.tab_list_content {
-    align-content: center;
-    table-layout: auto;
-    display: table;
-    white-space: pre;
-}
-
-.tab_list_content tr td{
-    border-spacing: 0;
-    padding: 5px;
+.login tr td {
     display: table-cell;
+    padding: 2px;
 }
 
-.scoreboard {
-    text-align: center;
-}
-
-.scoreboard_content {
-    display: table;
-    white-space: pre;
-}
-
-.scoreboard_content tr td {
-    border-spacing: 0;
-    padding: 5px;
-    display: table-cell;
-}
-
-h1, a, pre, .content {
+h1, a, pre, .login {
     margin: 0;
     color: rgb(228, 228, 228);
 }
 
-pre {
-    font-family: "Ubuntu Mono", monospace;
-}
-
-.content {
-    width: 480px;
-}
-
-.password {
+input {
     border-radius: 7px;
 }
 
@@ -88,89 +43,6 @@ button {
     transition-duration: 0.3s;
 }
 
-button.start {
+button.login {
     border: 3px solid #25c525;
-}
-
-button.stop {
-    border: 2px solid #f32727;
-}
-
-.cycleView {
-    width: 480px;
-    border: 2px solid grey;
-    height: 300px;
-    overflow: auto;
-    background: rgba(211, 211, 211, 0.16);
-    color: rgb(228, 228, 228);
-}
-
-.cycleView tr td{
-    padding-left: 5px;
-    padding-top: 2px;
-    border-spacing: 0;
-    color: rgb(228, 228, 228);
-}
-
-.send {
-    float: right;
-    border: 3px solid grey;
-    border-radius: 5px;
-    color: black;
-    background: lightgray;
-    cursor: pointer;
-    width: 50px;
-    padding: 0;
-}
-
-.options tr td{
-    margin-top: 10px
-}
-
-.chatInput, .consoleInput {
-    width: 420px;
-}
-
-#autoscroll {
-    text-align: center;
-}
-
-/* Style the tab */
-.tab {
-    overflow: hidden;
-    border: 1px solid #ccc;
-    background-color: rgba(241, 241, 241, 0.2);
-    text-align: center;
-}
-
-/* Style the buttons that are used to open the tab content */
-.tab button {
-    width: initial;
-    height: initial;
-    background-color: inherit;
-    float: left;
-    border: none;
-    border-radius: initial;
-    color: initial;
-    transition-duration: initial;
-    outline: none;
-    cursor: pointer;
-    padding: 14px 16px;
-    transition: 0.3s;
-}
-
-/* Change background color of buttons on hover */
-.tab button:hover {
-    background-color: #ddd;
-}
-
-/* Create an active/current tablink class */
-.tab button.active {
-    background-color: #ccc;
-}
-
-/* Style the tab content */
-.tabcontent {
-    display: none;
-    padding: 0;
 }

@@ -1,15 +1,6 @@
 //this module exposes functions and variables to control the HTTP server.
 const http = require('http'); //to serve the pages
 const fs = require('fs'); //to read the webpages from disk
-const CircularBuffer = require('circular-buffer');
-
-function bufferToString(buffer) {
-    let text = ""
-    buffer.toarray().forEach((msg) => {
-        text = text.concat("<tr><td>").concat(msg).concat("</td></tr>")
-    })
-    return text
-}
 
 module.exports = {
     createServer: (port) => {
@@ -26,9 +17,21 @@ module.exports = {
                 res.writeHead(200, {'Content-type': 'text/javascript'});
                 res.write(fs.readFileSync('webfiles/script.js'));
                 res.end();
-            } else if (req.url === "/utils.js") {
+            }else if (req.url === "/instance") {
+                res.writeHead(200, {'Content-type': 'text/html'});
+                res.write(fs.readFileSync('webfiles/instance/index.html'));
+                res.end();
+            } else if (req.url === "/instance/index.css") {
+                res.writeHead(200, {'Content-type': 'text/css'});
+                res.write(fs.readFileSync('webfiles/instance/index.css'));
+                res.end();
+            } else if (req.url === "/instance/script.js") {
                 res.writeHead(200, {'Content-type': 'text/javascript'});
-                res.write(fs.readFileSync('webfiles/utils.js'));
+                res.write(fs.readFileSync('webfiles/instance/script.js'));
+                res.end();
+            } else if (req.url === "/instance/utils.js") {
+                res.writeHead(200, {'Content-type': 'text/javascript'});
+                res.write(fs.readFileSync('webfiles/instance/utils.js'));
                 res.end();
             } else if (module.exports.password === "" || req.headers.xpassword === module.exports.password) {
                 if (req.url === "/update") {

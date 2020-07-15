@@ -1,0 +1,131 @@
+<html>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Ubuntu:regular,bold&subset=Latin">
+    <head>
+        <title>NOPE</title>
+        <link rel="stylesheet" href="index.css">
+    </head>
+    <body>
+        <table class="main_table">
+            <tr>
+                <td>
+                    <div class="tab_list">
+                        <h1>Tab list</h1>
+                        <table class="tab_list_content">
+                            <tr><td><pre>Nothing to show</pre></td></tr>
+                        </table>
+                    </div>
+                </td>
+                <td>
+                    <table class="sub_table">
+                        <tr><td>
+                            <div class="content">
+                                <h1>Connected as: <div class="uname">NOT CONNECTED</div> </h1>
+                                Password (leave blank if none) : <input type="password" class="password"><br>
+                                <button id="mainButton" class="start" onclick="start()">Connect</button><br><br>
+                                <input type="checkbox" class="restart" onchange="toggleRestartQueue()"> Restart if disconnected?
+                            </div>
+                        </td></tr>
+                        <tr><td style="padding-top: 15px">
+                            <!-- Tab links -->
+                            <div class="tab">
+                                <button id="btnChat" class="tablinks" onclick="openTab('Chat')">Chat</button>
+                                <button id="btnLog" class="tablinks" onclick="openTab('Log')">Log</button>
+                                <button id="btnConsole" class="tablinks" onclick="openTab('Console')">Console</button>
+                                <button id="btnOptions" class="tablinks" onclick="openTab('Options')">Options</button>
+                            </div>
+
+                        </td></tr>
+                        <tr><td>
+                            <!-- Tab content -->
+                            <div id="Chat" class="tabcontent">
+                                <div id="divChat" class="cycleView" onresize="scrollChat()">
+                                <table class="chat">
+                                    <tr><td>Chat</td></tr>
+                                </table>
+                                </div><br>
+                                <input type="text" class="chatInput">
+                                <button id="sendChat" class="send" onclick="sendChat()"><b>Send</b></button>
+                            </div>
+
+                            <div id="Log" class="tabcontent">
+                                <div class="cycleView" id="divLog">
+                                <table class="log">
+                                    <tr><td>Log</td></tr>
+                                </table>
+                                </div>
+                            </div>
+
+                            <div id="Console" class="tabcontent">
+                                <div id="divConsole" class="cycleView">
+                                <table class="console">
+                                    <tr><td>Console</td></tr>
+                                </table>
+                                </div><br>
+                                <input type="text" class="consoleInput">
+                                <button id="sendConsole" class="send" onclick="sendConsole()"><b>Send</b></button>
+                            </div>
+                            <div id="Options" class="tabcontent">
+                                <div id="divOptions" class="cycleView">
+                                <table class="options">
+                                    <tr><td>Options</td></tr>
+                                </table>
+                                </div>
+                            </div>
+                            <script>
+                                function scrollChat() {
+                                    let element = document.getElementById("divChat");
+                                    element.scrollTop = element.scrollHeight;
+                                }
+
+                                function scrollLog() {
+                                    let element = document.getElementById("divConsole");
+                                    element.scrollTop = element.scrollHeight;
+                                }
+
+                                function scrollConsole() {
+                                    let element = document.getElementById("divLog");
+                                    element.scrollTop = element.scrollHeight;
+                                }
+
+                                function openTab(tabName) {
+                                    // Declare all variables
+                                    var i, tabcontent, tablinks;
+
+                                    // Get all elements with class="tabcontent" and hide them
+                                    tabcontent = document.getElementsByClassName("tabcontent");
+                                    for (i = 0; i < tabcontent.length; i++) {
+                                        tabcontent[i].style.display = "none";
+                                    }
+
+                                    // Get all elements with class="tablinks" and remove the class "active"
+                                    tablinks = document.getElementsByClassName("tablinks");
+                                    for (i = 0; i < tablinks.length; i++) {
+                                        tablinks[i].className = tablinks[i].className.replace(" active", "");
+                                    }
+
+                                    // Show the current tab, and add an "active" class to the button that opened the tab
+                                    document.getElementById(tabName).style.display = "block";
+                                    document.getElementById("btn"+tabName).className += " active";
+                                }
+                            </script>
+                        </td></tr>
+
+                        </td></tr>
+
+                    </table>
+                </td>
+                <td>
+                    <div class="scoreboard">
+                        <h1 id="scoreboard_title">Scoreboard</h1>
+                        <table class="scoreboard_content">
+                            <tr><td><pre>Nothing to show</pre></td></tr>
+                        </table>
+                    </div>
+                </td>
+            </tr>
+        </table>
+        <script src="script.js"></script>
+        <script src="utils.js"></script>
+    </body>
+</html>
