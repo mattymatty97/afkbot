@@ -20,7 +20,7 @@ class Session{
     }
 
 
-    updateScoreboard(scoreboard, update) {
+    updateScoreboard(scoreboard) {
         if(this.bot.scoreboard["sidebar"] === scoreboard) {
             this.scoreboard = {};
             this.scoreboard["title"]=scoreboard.title
@@ -113,13 +113,13 @@ class Session{
                 if (this.bot.scoreboard["sidebar"] === undefined){
                     this.scoreboard = {};
                 }else{
-                    updateScoreboard()
+                    this.updateScoreboard()
                 }
             })
 
-            this.bot.on("scoreUpdated",updateScoreboard)
-            this.bot.on("scoreRemoved",updateScoreboard)
-            this.bot.on("scoreboardTitleChanged",updateScoreboard)
+            this.bot.on("scoreUpdated",this.updateScoreboard)
+            this.bot.on("scoreRemoved",this.updateScoreboard)
+            this.bot.on("scoreboardTitleChanged",this.updateScoreboard)
 
         }
     }
