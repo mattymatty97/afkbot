@@ -20,30 +20,36 @@ class Session{
     }
 
 
-    updateScoreboard(session, scoreboard) {
-        if(session.bot.scoreboard["sidebar"] === scoreboard) {
-            session.scoreboard = {};
-            session.scoreboard["title"]=scoreboard.title
-            session.scoreboard["entries"]={}
+    updateScoreboard(scoreboard) {
+        if(this.bot.scoreboard["sidebar"] === scoreboard) {
+            this.scoreboard = {};
+            this.scoreboard["title"]=scoreboard.title
+            this.scoreboard["entries"]={}
             for (let item in scoreboard.items.slice(15) ) {
-                session.scoreboard["entries"][item.name]=item.value;
+                this.scoreboard["entries"][item.name]=item.value;
             }
-        }else if(session.bot.scoreboard["list"] === scoreboard){
+        }else if(this.bot.scoreboard["list"] === scoreboard){
             this.updateTablist()
         }
     }
 
-    updateTablist(session) {
-        let listScore = session.bot.scoreboard["list"];
+    updateTablist() {
+        let listScore = this.bot.scoreboard["list"];
         let tablist = {}
-        for (let pl in session.bot.players) {
-            tablist[session.bot.players[pl].displayName.toMotd()] = (listScore !== undefined && listScore.itemsMap[pl] !== undefined)?listScore.itemsMap[pl].value:null
+        for (let pl in this.bot.players) {
+            tablist[this.bot.players[pl].displayName.toMotd()] = (listScore !== undefined && listScore.itemsMap[pl] !== undefined)?listScore.itemsMap[pl].value:null
         }
-        session.tablist = tablist;
+        this.tablist = tablist;
     }
 
     start() {
         let session = this
+        let onScoreBaord = (scoreboard)=>{
+            this.updateScoreboard(scoreboard)
+        }
+        let onTabList = ()=>{
+            this.updateTablist()
+        }
         if ( session.bot === undefined ) {
             session.log.push({
                 text: "Connecting to "+session.options.config.server.ip+":"+session.options.config.server.port,
@@ -71,12 +77,10 @@ class Session{
             }))
 
             session.bot.on("message",(jsonMessage)=>{
-                //const ChatMessage = require('mineflayer/lib/chat_message')(bot.version);
-                //let message = new ChatMessage(jsonMessage)
                 session.chat.push(jsonMessage.toMotd())
             })
 
-            session.bot.on("login", client => {
+            session.bot.on("login", () => {
                 session.connected = true;
                 session.username = session.bot.username;
                 session.log.push({
@@ -85,18 +89,12 @@ class Session{
                 })
             })
 
-            session.bot.on("spawn", ()=>{
-                session.updateTablist(session)
-            })
+            session.bot.on("spawn", onTabList)
 
-            session.bot.on("playerJoined",()=>{
-                session.updateTablist(session)
-            })
-            session.bot.on("playerLeft",()=>{
-                session.updateTablist(session)
-            })
+            session.bot.on("playerJoined",onTabList)
+            session.bot.on("playerLeft",onTabList)
 
-            session.bot.on("end", (ignored) => {
+            session.bot.on("end", () => {
                 session.log.push({
                     text: "Disconnected"
                 })
@@ -120,19 +118,13 @@ class Session{
                 if (session.bot.scoreboard["sidebar"] === undefined){
                     session.scoreboard = {};
                 }else{
-                    session.updateScoreboard(session,scoreboard)
+                    onScoreBaord(scoreboard)
                 }
             })
 
-            session.bot.on("scoreUpdated",(scoreboard)=>{
-                session.updateScoreboard(session,scoreboard)
-            })
-            session.bot.on("scoreRemoved",(scoreboard)=>{
-                session.updateScoreboard(session,scoreboard)
-            })
-            session.bot.on("scoreboardTitleChanged",(scoreboard)=>{
-                session.updateScoreboard(session,scoreboard)
-            })
+            session.bot.on("scoreUpdated",onScoreBaord)
+            session.bot.on("scoreRemoved",onScoreBaord)
+            session.bot.on("scoreboardTitleChanged",onScoreBaord)
 
         }
     }
@@ -150,6 +142,10 @@ class Session{
         if(this.bot!==undefined){
             this.bot.chat(msg);
         }
+    }
+
+    execConsole(console){
+        eval(console)
     }
 
 }
