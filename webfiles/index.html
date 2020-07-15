@@ -49,7 +49,7 @@
                             </div>
 
                             <div id="Log" class="tabcontent">
-                                <div class="cycleView" id="divLog" onresize="scrollLog()">
+                                <div class="cycleView" id="divLog">
                                 <table class="log">
                                     <tr><td>Log</td></tr>
                                 </table>
@@ -57,13 +57,20 @@
                             </div>
 
                             <div id="Console" class="tabcontent">
-                                <div id="divConsole" class="cycleView" onresize="scrollConsole()">
+                                <div id="divConsole" class="cycleView">
                                 <table class="console">
                                     <tr><td>Console</td></tr>
                                 </table>
                                 </div><br>
                                 <input type="text" class="consoleInput">
                                 <button id="sendConsole" class="send" onclick="sendConsole()"><b>Send</b></button>
+                            </div>
+                            <div id="Options" class="tabcontent">
+                                <div id="divOptions" class="cycleView">
+                                <table class="options">
+                                    <tr><td>Options</td></tr>
+                                </table>
+                                </div>
                             </div>
                             <script>
                                 function scrollChat() {
@@ -118,7 +125,7 @@
                 </td>
             </tr>
         </table>
-        <script src="/webfiles/script.js"></script>
-        <script src="/webfiles/utils.js"></script>
+        <script src="script.js"></script>
+        <script src="utils.js"></script>
     </body>
 </html>

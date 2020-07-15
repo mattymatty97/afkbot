@@ -16,77 +16,84 @@ module.exports = {
         http.createServer((req, res) => {
             if (req.url === "/") {
                 res.writeHead(200, {'Content-type': 'text/html'});
-                res.write(fs.readFileSync('index.html'));
+                res.write(fs.readFileSync('webfiles/index.html'));
                 res.end();
             } else if (req.url === "/index.css") {
                 res.writeHead(200, {'Content-type': 'text/css'});
-                res.write(fs.readFileSync('index.css'));
+                res.write(fs.readFileSync('webfiles/index.css'));
                 res.end();
             } else if (req.url === "/script.js") {
                 res.writeHead(200, {'Content-type': 'text/javascript'});
-                res.write(fs.readFileSync('script.js'));
+                res.write(fs.readFileSync('webfiles/script.js'));
                 res.end();
             } else if (req.url === "/utils.js") {
                 res.writeHead(200, {'Content-type': 'text/javascript'});
-                res.write(fs.readFileSync('utils.js'));
+                res.write(fs.readFileSync('webfiles/utils.js'));
                 res.end();
             } else if (module.exports.password === "" || req.headers.xpassword === module.exports.password) {
                 if (req.url === "/update") {
-                    if (req.headers.hasOwnProperty("XTarget"))
+                    if (req.headers.hasOwnProperty("xtarget"))
                         switch (req.headers.XTarget) {
                             case "tablist": {
                                 res.writeHead(200, {'Content-type': 'text/json'});
                                 res.write(JSON.stringify({
-                                    tablist: module.exports.tablist
+                                    tablist: module.exports.session.tablist
                                 }))
                             }
                                 break;
                             case "scoreboard": {
                                 res.writeHead(200, {'Content-type': 'text/json'});
                                 res.write(JSON.stringify({
-                                    scoreboard: module.exports.scoreboard
+                                    scoreboard: module.exports.session.scoreboard
                                 }))
                             }
                                 break;
                             case "chat": {
                                 res.writeHead(200, {'Content-type': 'text/json'});
                                 res.write(JSON.stringify({
-                                    chat: module.exports.chat.toarray()
+                                    chat: module.exports.session.chat.toarray()
                                 }))
                             }
                                 break;
                             case "log": {
                                 res.writeHead(200, {'Content-type': 'text/json'});
                                 res.write(JSON.stringify({
-                                    log: module.exports.log.toarray()
+                                    log: module.exports.session.log.toarray()
                                 }))
                             }
                                 break;
                             case "console": {
                                 res.writeHead(200, {'Content-type': 'text/json'});
                                 res.write(JSON.stringify({
-                                    console: module.exports.console.toarray()
+                                    console: module.exports.session.console.toarray()
                                 }))
                             }
                                 break;
                             case "username": {
                                 res.writeHead(200, {'Content-type': 'text/json'});
                                 res.write(JSON.stringify({
-                                    username: module.exports.username
+                                    username: module.exports.session.username
                                 }))
                             }
                                 break;
                             case "connected": {
                                 res.writeHead(200, {'Content-type': 'text/json'});
                                 res.write(JSON.stringify({
-                                    connected: module.exports.isConnected
+                                    connected: module.exports.session.isConnected
                                 }))
                             }
                                 break;
                             case "restart": {
                                 res.writeHead(200, {'Content-type': 'text/json'});
                                 res.write(JSON.stringify({
-                                    restart: module.exports.restart
+                                    restart: module.exports.session.restart
+                                }))
+                            }
+                                break;
+                            case "options": {
+                                res.writeHead(200, {'Content-type': 'text/json'});
+                                res.write(JSON.stringify({
+                                    options: module.exports.session.options
                                 }))
                             }
                                 break;
@@ -95,14 +102,15 @@ module.exports = {
                         } else {
                         res.writeHead(200, {'Content-type': 'text/json'});
                         res.write(JSON.stringify({
-                                tablist: module.exports.tablist,
-                                scoreboard: module.exports.scoreboard,
-                                chat: module.exports.chat.toarray(),
-                                log: module.exports.log.toarray(),
-                                console: module.exports.console.toarray(),
-                                username: module.exports.username,
-                                connected: module.exports.isConnected,
-                                restart: module.exports.restart
+                                tablist: module.exports.session.tablist,
+                                scoreboard: module.exports.session.scoreboard,
+                                chat: module.exports.session.chat.toarray(),
+                                log: module.exports.session.log.toarray(),
+                                console: module.exports.session.console.toarray(),
+                                username: module.exports.session.username,
+                                connected: module.exports.session.isConnected,
+                                restart: module.exports.session.restart,
+                                options: module.exports.session.options
                             })
                         )
                     }
@@ -110,15 +118,24 @@ module.exports = {
                 } else if (req.url === "/start") { //API endpoint to start queuing
                     res.writeHead(200);
                     res.end();
-                    module.exports.onstartcallback();
+                    module.exports.session.start();
                 } else if (req.url === "/stop") { //API endpoint to stop queuing
                     res.writeHead(200);
                     res.end();
-                    module.exports.onstopcallback();
+                    module.exports.session.stop();
                 } else if (req.url === "/restart") {
-                    if(req.headers.hasOwnProperty("XRestart")) {
+                    if(req.headers.hasOwnProperty("xrestart")) {
                         res.writeHead(200);
-                        module.exports.restart = req.headers.XRestart
+                        module.exports.session.restart = req.headers.XRestart
+                        res.end();
+                    }else{
+                        res.writeHead(400);
+                        res.end()
+                    }
+                } else if (req.url === "/options") {
+                    if(req.headers.hasOwnProperty("xoptions")) {
+                        res.writeHead(200);
+                        module.exports.session.options = JSON.parse(req.headers.xoptions)
                         res.end();
                     }else{
                         res.writeHead(400);
@@ -127,9 +144,9 @@ module.exports = {
                 } else if (req.url === "/send") {
                     if (req.headers.hasOwnProperty("xchat") && req.headers.hasOwnProperty("xtext")) {
                         if (req.headers.xchat) {
-                            module.exports.onchatcallback(req.headers.xtext)
+                            module.exports.session.sendChat(req.headers.xtext)
                         } else {
-                            module.exports.onconsolecallback(req.headers.xtext)
+
                         }
                         res.writeHead(200);
                     }else {
@@ -146,30 +163,7 @@ module.exports = {
             }
         }).listen(port);
     },
-    onstart: (callback) => { //function to set the action to do when starting
-        module.exports.onstartcallback = callback;
-    },
-    onstop: (callback) => { //same but to stop
-        module.exports.onstopcallback = callback;
-    },
-    onchat: (callback) => { //function to set the action to do when starting
-        module.exports.onchatcallback = callback;
-    },
-    onconsole: (callback) => { //same but to stop
-        module.exports.onconsolecallback = callback;
-    },
-    isConnected: false, //are we connected
-    restart: false, //when at the end of the queue, restart if no client is connected?
-    tablist: {},
-    scoreboard: {},
-    username: "NOT CONNECTED",
-    chat: new CircularBuffer(70),
-    log: new CircularBuffer(100),
-    console: new CircularBuffer(200),
-    onstartcallback: null, //a save of the action to start
-    onstopcallback: null, //same but to stop
-    onchatcallback: null,
-    onconsolecallback: null,
+    session: null,
     password: "" //the password to use for the webapp
 };
 

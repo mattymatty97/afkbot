@@ -46,11 +46,11 @@ body {
 
 .scoreboard {
     text-align: center;
-    white-space: pre;
 }
 
 .scoreboard_content {
     display: table;
+    white-space: pre;
 }
 
 .scoreboard_content tr td {
@@ -121,6 +121,10 @@ button.stop {
     cursor: pointer;
     width: 50px;
     padding: 0;
+}
+
+.options tr td{
+    margin-top: 10px
 }
 
 .chatInput, .consoleInput {

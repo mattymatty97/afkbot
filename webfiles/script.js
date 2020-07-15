@@ -16,8 +16,9 @@ function stop() {
 
 function toggleRestartQueue() {
     const xhr = new XMLHttpRequest();
-    xhr.open("GET", "/togglerestart", true);
+    xhr.open("GET", "/restart", true);
     xhr.setRequestHeader('XPassword', document.getElementsByClassName('password')[0].value)
+    xhr.setRequestHeader('XRestart', document.getElementsByClassName('restart')[0].checked)
     xhr.send();
 }
 
@@ -88,6 +89,15 @@ function updateConsole() {
     xhr.send();
 }
 
+function updateOptions() {
+    const xhr = new XMLHttpRequest();
+    xhr.open("GET", "/update", true);
+    xhr.setRequestHeader('XTarget', "options")
+    xhr.onreadystatechange = updatePageComponents()
+    xhr.setRequestHeader('XPassword', document.getElementsByClassName('password')[0].value)
+    xhr.send();
+}
+
 function updateAll() {
     const xhr = new XMLHttpRequest();
     xhr.open("GET", "/update", true);
@@ -103,8 +113,8 @@ let old_scoreboard = {}
 let old_chat = {}
 let old_log = {}
 let old_console = {}
+let old_options = {}
 let old_uname = "NOT CONNECTED"
-
 
 function updatePageComponents(req) {
     if (req.readyState === 4 && req.status === 200) {
@@ -203,6 +213,9 @@ function updatePageComponents(req) {
                 old_console = console
             }
         }
+        if (response.hasOwnProperty("options")) {
+            parseOptions(response);
+        }
         if (response.hasOwnProperty("username")) {
             let username = response.username
             if(old_uname !== username) {
@@ -230,4 +243,72 @@ function updatePageComponents(req) {
             }
         }
     }
+}
+
+
+function makeOtpLine(obj, root) {
+    let html = ""
+    Object.keys(obj).forEach((key)=>{
+        let value = obj[key]
+        if (typeof (value) !== "object") {
+            html = html
+                .concat("<tr><td>").concat(key).concat(":</td><td>").concat(makeInput(value,root + key)).concat("</td></td></tr>")
+        }else{
+            html = html.concat("<tr><td>").concat(key).concat(": </td><td><table>").concat(makeOtpLine(value,root + key + ".")).concat("</table></td>")
+        }
+    })
+    return html;
+}
+
+function parseOptions(response) {
+    let options = response.options
+    let new_html = ""
+    if (JSON.stringify(old_options) !== JSON.stringify(options)) {
+        if (JSON.stringify(options) === JSON.stringify({})) {
+            new_html = ""
+        } else {
+            new_html = new_html.concat(makeOtpLine(options,""))
+        }
+        let element = document.getElementsByClassName("options")[0]
+        element.innerHTML = new_html;
+        old_options = options
+    }
+}
+
+function makeInput(value,key) {
+    switch (typeof value) {
+        case "string":
+            if(key.includes("password"))
+                return "<input id='"+key+"' type='password' value='"+value+"' onchange='updateOpt(\""+key+"\")'>"
+            return "<input id='"+key+"' type='text' value='"+value+"' onchange='updateOpt(\""+key+"\")'>"
+        case "boolean":
+            return "<input id='"+key+"' type='checkbox' checked='"+value+"' onchange='updateOpt(\""+key+"\")'>"
+        case "number":
+            return "<input id='"+key+"' type='number' value='"+value+"' onchange='updateOpt(\""+key+"\")'>"
+    }
+}
+
+function updateOpt(id) {
+    let new_opt = JSON.parse(JSON.stringify(old_options))
+    let element = document.getElementById(id)
+    set(new_opt,id,element.value)
+
+    let xhr = new XMLHttpRequest();
+    xhr.open("GET", "/options", true);
+    xhr.setRequestHeader('XPassword', document.getElementsByClassName('password')[0].value)
+    xhr.setRequestHeader('XOptions', JSON.stringify(new_opt))
+    xhr.send();
+}
+
+function set(obj, path, value) {
+    var schema = obj;  // a moving reference to internal objects within obj
+    var pList = path.split('.');
+    var len = pList.length;
+    for(var i = 0; i < len-1; i++) {
+        var elem = pList[i];
+        if( !schema[elem] ) schema[elem] = {}
+        schema = schema[elem];
+    }
+
+    schema[pList[len-1]] = value;
 }
