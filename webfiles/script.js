@@ -132,7 +132,7 @@ function updatePageComponents(req) {
                             new_html = new_html.concat("<tr><td><a style='text-align: left'>").concat(
                                 MotdToHtml(escapeHtml(key))
                             ).concat("</a></td>")
-                                .concat("<a style='text-align: right'>").concat((value !== null) ? value : "").concat("</a></td></tr>")
+                                .concat("<td><a style='text-align: right; color: yellow'>").concat((value !== null) ? value : "").concat("</a></td></tr>")
                     })
                 }
                 let element = document.getElementsByClassName("tab_list_content")[0]
