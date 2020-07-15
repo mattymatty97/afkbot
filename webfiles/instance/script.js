@@ -1,23 +1,29 @@
 setInterval(updateAll, 1000);
 
+function logout() {
+    document.cookie = "user="
+    document.cookie = "password="
+    window.location.href = window.location.href.replace("/instance","/")
+}
+
 function start() {
     const xhr = new XMLHttpRequest();
     xhr.open("GET", "/start", true);
-    xhr.setRequestHeader('XPassword', document.getElementsByClassName('password')[0].value)
+    setHeaders(xhr)
     xhr.send();
 }
 
 function stop() {
     const xhr = new XMLHttpRequest();
     xhr.open("GET", "/stop", true);
-    xhr.setRequestHeader('XPassword', document.getElementsByClassName('password')[0].value)
+    setHeaders(xhr)
     xhr.send();
 }
 
 function toggleRestartQueue() {
     const xhr = new XMLHttpRequest();
     xhr.open("GET", "/restart", true);
-    xhr.setRequestHeader('XPassword', document.getElementsByClassName('password')[0].value)
+    setHeaders(xhr)
     xhr.setRequestHeader('XRestart', document.getElementsByClassName('restart')[0].checked)
     xhr.send();
 }
@@ -25,7 +31,7 @@ function toggleRestartQueue() {
 function sendChat() {
     const xhr = new XMLHttpRequest();
     xhr.open("GET", "/send", true);
-    xhr.setRequestHeader('XPassword', document.getElementsByClassName('password')[0].value)
+    setHeaders(xhr)
     xhr.setRequestHeader('XChat', true)
     xhr.setRequestHeader('XText', document.getElementsByClassName('chatInput')[0].value)
     xhr.send();
@@ -35,7 +41,7 @@ function sendChat() {
 function sendConsole() {
     const xhr = new XMLHttpRequest();
     xhr.open("GET", "/send", true);
-    xhr.setRequestHeader('XPassword', document.getElementsByClassName('password')[0].value)
+    setHeaders(xhr)
     xhr.setRequestHeader('XChat', false)
     xhr.setRequestHeader('XText', document.getElementsByClassName('consoleInput')[0].value)
     xhr.send();
@@ -49,7 +55,7 @@ function updateTabList() {
     xhr.onreadystatechange = function () {
         updatePageComponents(this)
     }
-    xhr.setRequestHeader('XPassword', document.getElementsByClassName('password')[0].value)
+    setHeaders(xhr)
     xhr.send();
 }
 
@@ -58,7 +64,7 @@ function updateScoreboard() {
     xhr.open("GET", "/update", true);
     xhr.setRequestHeader('XTarget', "scoreboard")
     xhr.onreadystatechange = updatePageComponents()
-    xhr.setRequestHeader('XPassword', document.getElementsByClassName('password')[0].value)
+    setHeaders(xhr)
     xhr.send();
 }
 
@@ -67,7 +73,7 @@ function updateChat() {
     xhr.open("GET", "/update", true);
     xhr.setRequestHeader('XTarget', "chat")
     xhr.onreadystatechange = updatePageComponents()
-    xhr.setRequestHeader('XPassword', document.getElementsByClassName('password')[0].value)
+    setHeaders(xhr)
     xhr.send();
 }
 
@@ -76,7 +82,7 @@ function updateLog() {
     xhr.open("GET", "/update", true);
     xhr.setRequestHeader('XTarget', "log")
     xhr.onreadystatechange = updatePageComponents()
-    xhr.setRequestHeader('XPassword', document.getElementsByClassName('password')[0].value)
+    setHeaders(xhr)
     xhr.send();
 }
 
@@ -85,7 +91,7 @@ function updateConsole() {
     xhr.open("GET", "/update", true);
     xhr.setRequestHeader('XTarget', "console")
     xhr.onreadystatechange = updatePageComponents()
-    xhr.setRequestHeader('XPassword', document.getElementsByClassName('password')[0].value)
+    setHeaders(xhr)
     xhr.send();
 }
 
@@ -94,7 +100,7 @@ function updateOptions() {
     xhr.open("GET", "/update", true);
     xhr.setRequestHeader('XTarget', "options")
     xhr.onreadystatechange = updatePageComponents()
-    xhr.setRequestHeader('XPassword', document.getElementsByClassName('password')[0].value)
+    setHeaders(xhr)
     xhr.send();
 }
 
@@ -104,7 +110,7 @@ function updateAll() {
     xhr.onreadystatechange = function () {
         updatePageComponents(this)
     }
-    xhr.setRequestHeader('XPassword', document.getElementsByClassName('password')[0].value)
+    setHeaders(xhr)
     xhr.send();
 }
 
@@ -297,7 +303,7 @@ function updateOpt(id) {
 
     let xhr = new XMLHttpRequest();
     xhr.open("GET", "/options", true);
-    xhr.setRequestHeader('XPassword', document.getElementsByClassName('password')[0].value)
+    setHeaders(xhr)
     xhr.setRequestHeader('XOptions', JSON.stringify(new_opt))
     xhr.send();
 }
@@ -313,4 +319,25 @@ function set(obj, path, value) {
     }
 
     schema[pList[len-1]] = value;
+}
+
+function setHeaders(req) {
+    req.setRequestHeader('XPassword', getCookie("password"))
+    req.setRequestHeader('XUser', getCookie("user"))
+}
+
+function getCookie(cname) {
+    var name = cname + "=";
+    var decodedCookie = decodeURIComponent(document.cookie);
+    var ca = decodedCookie.split(';');
+    for(var i = 0; i <ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0) === ' ') {
+            c = c.substring(1);
+        }
+        if (c.indexOf(name) === 0) {
+            return c.substring(name.length, c.length);
+        }
+    }
+    return "";
 }

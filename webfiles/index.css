@@ -8,13 +8,24 @@ body {
     background-color: rgb(16, 16, 26);
     color: black;
     font-family: "Ubuntu", serif;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
-.main_table td{
-    padding: 25px;
-    display: inline-flex;
-    vertical-align: top;
-    /*border: 1px solid red;*/
+#page {
+    margin: 20px;
+    display: grid;
+    min-height: 100%;
+    height: max-content;
+    width: 100%;
+    grid-template-columns: auto max-content auto;
+    grid-template-areas: ". a .";
+    grid-column-gap: 20px;
+    align-content: center;
+}
+
+#content {
+    grid-area: a;
 }
 
 .login tr td {

@@ -2,11 +2,5 @@
     "ports":{
         "web":8080
     },
-    "openBrowserOnStart": false,
-    "password":"",
-    "server": {
-        "ip": "blazenarchy.net",
-        "port": 25565
-    },
-    "reconnectTimeout": 3000
+    "openBrowserOnStart": false
 }

@@ -3,28 +3,31 @@
 <link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Ubuntu:regular,bold&subset=Latin">
 <head>
     <title>NOPE</title>
-    <link rel="stylesheet" href="Instance/index.css">
+    <link rel="stylesheet" href="index.css">
 </head>
 <body>
-<table class="main_table">
-    <tr>
-        <td>
-            <div class="login">
-                <h1>Login as:</h1>
-                <table style="display: table"><tr>
-                    <td><a>UserID: </a></td><td><input type="text" class="userid"><br></td>
-                </tr><tr>
-                    <td><a>Password: </a></td><td><input type="password" class="password"></td>
-                </tr></table>
-                <br>
-                <button id="mainButton" class="Login" onclick="login()">Login</button>
-            </div>
+<div id="page">
+    <div id="content">
+        <div class="login">
+            <h1>Login as:</h1>
+            <table style="display: table">
+                <tr>
+                    <td><a>UserID: </a></td>
+                    <td><input type="text" class="userid"><br></td>
+                </tr>
+                <tr>
+                    <td><a>Password: </a></td>
+                    <td><input type="password" class="password"></td>
+                </tr>
+            </table>
             <br>
-            <div id="error">
-            </div>
-        </td>
-    </tr>
-</table>
+            <button id="mainButton" class="login" onclick="login()">Login</button>
+        </div>
+        <br>
+        <div id="error" style="background: rgba(191,191,68,0.85); color: red">
+        </div>
+    </div>
+</div>
 <script src="script.js"></script>
 </body>
 </html>

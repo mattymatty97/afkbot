@@ -33,140 +33,161 @@ module.exports = {
                 res.writeHead(200, {'Content-type': 'text/javascript'});
                 res.write(fs.readFileSync('webfiles/instance/utils.js'));
                 res.end();
-            } else if (module.exports.password === "" || req.headers.xpassword === module.exports.password) {
-                if (req.url === "/update") {
-                    if (req.headers.hasOwnProperty("xtarget"))
-                        switch (req.headers.XTarget) {
-                            case "tablist": {
-                                res.writeHead(200, {'Content-type': 'text/json'});
-                                res.write(JSON.stringify({
-                                    tablist: module.exports.session.tablist
-                                }))
-                            }
-                                break;
-                            case "scoreboard": {
-                                res.writeHead(200, {'Content-type': 'text/json'});
-                                res.write(JSON.stringify({
-                                    scoreboard: module.exports.session.scoreboard
-                                }))
-                            }
-                                break;
-                            case "chat": {
-                                res.writeHead(200, {'Content-type': 'text/json'});
-                                res.write(JSON.stringify({
-                                    chat: module.exports.session.chat.toarray()
-                                }))
-                            }
-                                break;
-                            case "log": {
-                                res.writeHead(200, {'Content-type': 'text/json'});
-                                res.write(JSON.stringify({
-                                    log: module.exports.session.log.toarray()
-                                }))
-                            }
-                                break;
-                            case "console": {
-                                res.writeHead(200, {'Content-type': 'text/json'});
-                                res.write(JSON.stringify({
-                                    console: module.exports.session.console.toarray()
-                                }))
-                            }
-                                break;
-                            case "username": {
-                                res.writeHead(200, {'Content-type': 'text/json'});
-                                res.write(JSON.stringify({
-                                    username: module.exports.session.username
-                                }))
-                            }
-                                break;
-                            case "connected": {
-                                res.writeHead(200, {'Content-type': 'text/json'});
-                                res.write(JSON.stringify({
-                                    connected: module.exports.session.connected
-                                }))
-                            }
-                                break;
-                            case "restart": {
-                                res.writeHead(200, {'Content-type': 'text/json'});
-                                res.write(JSON.stringify({
-                                    restart: module.exports.session.restart
-                                }))
-                            }
-                                break;
-                            case "options": {
-                                res.writeHead(200, {'Content-type': 'text/json'});
-                                res.write(JSON.stringify({
-                                    options: module.exports.session.options
-                                }))
-                            }
-                                break;
-                            default:
-                                res.writeHead(404);
-                        } else {
-                        res.writeHead(200, {'Content-type': 'text/json'});
-                        res.write(JSON.stringify({
-                                tablist: module.exports.session.tablist,
-                                scoreboard: module.exports.session.scoreboard,
-                                chat: module.exports.session.chat.toarray(),
-                                log: module.exports.session.log.toarray(),
-                                console: module.exports.session.console.toarray(),
-                                username: module.exports.session.username,
-                                connected: module.exports.session.connected,
-                                restart: module.exports.session.restart,
-                                options: module.exports.session.options
-                            })
-                        )
-                    }
-                    res.end();
-                } else if (req.url === "/start") { //API endpoint to start queuing
-                    res.writeHead(200);
-                    res.end();
-                    module.exports.session.start();
-                } else if (req.url === "/stop") { //API endpoint to stop queuing
-                    res.writeHead(200);
-                    res.end();
-                    module.exports.session.stop();
-                } else if (req.url === "/restart") {
-                    if(req.headers.hasOwnProperty("xrestart")) {
-                        res.writeHead(200);
-                        module.exports.session.restart = (req.headers.xrestart === 'true')
-                        res.end();
+            } else if (req.url === "/login"){
+                if (req.headers.hasOwnProperty("xuser") && req.headers.hasOwnProperty("xpassword")){
+                    let instance = getInstance(req.headers.xuser,req.headers.xpassword)
+                    if(instance !== undefined){
+                        res.writeHead(200)
                     }else{
-                        res.writeHead(400);
-                        res.end()
+                        res.writeHead(401)
                     }
-                } else if (req.url === "/options") {
-                    if(req.headers.hasOwnProperty("xoptions")) {
-                        res.writeHead(200);
-                        module.exports.session.options = JSON.parse(req.headers.xoptions)
-                        res.end();
-                    }else{
-                        res.writeHead(400);
-                        res.end()
-                    }
-                } else if (req.url === "/send") {
-                    if (req.headers.hasOwnProperty("xchat") && req.headers.hasOwnProperty("xtext")) {
-                        if (req.headers.xchat === 'true') {
-                            module.exports.session.sendChat(req.headers.xtext)
-                        } else {
-                            module.exports.session.execConsole(req.headers.xtext)
-                        }
-                        res.writeHead(200);
-                    }else {
-                        res.writeHead(400)
-                    }
-                    res.end();
-                } else {
-                    res.writeHead(404);
-                    res.end();
+                }else{
+                    res.writeHead(401)
                 }
-            } else {
-                res.writeHead(403);
-                res.end()
+                res.end();
+            }else if (req.headers.hasOwnProperty("xuser") && req.headers.hasOwnProperty("xpassword")){
+                let instance = getInstance(req.headers.xuser,req.headers.xpassword)
+                if (instance !== undefined) {
+                    if (req.url === "/update") {
+                        if (req.headers.hasOwnProperty("xtarget"))
+                            switch (req.headers.XTarget) {
+                                case "tablist": {
+                                    res.writeHead(200, {'Content-type': 'text/json'});
+                                    res.write(JSON.stringify({
+                                        tablist: instance.sessions[0].tablist
+                                    }))
+                                }
+                                    break;
+                                case "scoreboard": {
+                                    res.writeHead(200, {'Content-type': 'text/json'});
+                                    res.write(JSON.stringify({
+                                        scoreboard: instance.sessions[0].scoreboard
+                                    }))
+                                }
+                                    break;
+                                case "chat": {
+                                    res.writeHead(200, {'Content-type': 'text/json'});
+                                    res.write(JSON.stringify({
+                                        chat: instance.sessions[0].chat.toarray()
+                                    }))
+                                }
+                                    break;
+                                case "log": {
+                                    res.writeHead(200, {'Content-type': 'text/json'});
+                                    res.write(JSON.stringify({
+                                        log: instance.sessions[0].log.toarray()
+                                    }))
+                                }
+                                    break;
+                                case "console": {
+                                    res.writeHead(200, {'Content-type': 'text/json'});
+                                    res.write(JSON.stringify({
+                                        console: instance.sessions[0].console.toarray()
+                                    }))
+                                }
+                                    break;
+                                case "username": {
+                                    res.writeHead(200, {'Content-type': 'text/json'});
+                                    res.write(JSON.stringify({
+                                        username: instance.sessions[0].username
+                                    }))
+                                }
+                                    break;
+                                case "connected": {
+                                    res.writeHead(200, {'Content-type': 'text/json'});
+                                    res.write(JSON.stringify({
+                                        connected: instance.sessions[0].connected
+                                    }))
+                                }
+                                    break;
+                                case "restart": {
+                                    res.writeHead(200, {'Content-type': 'text/json'});
+                                    res.write(JSON.stringify({
+                                        restart: instance.sessions[0].restart
+                                    }))
+                                }
+                                    break;
+                                case "options": {
+                                    res.writeHead(200, {'Content-type': 'text/json'});
+                                    res.write(JSON.stringify({
+                                        options: instance.sessions[0].options
+                                    }))
+                                }
+                                    break;
+                                default:
+                                    res.writeHead(404);
+                            } else {
+                            res.writeHead(200, {'Content-type': 'text/json'});
+                            res.write(JSON.stringify({
+                                    tablist: instance.sessions[0].tablist,
+                                    scoreboard: instance.sessions[0].scoreboard,
+                                    chat: instance.sessions[0].chat.toarray(),
+                                    log: instance.sessions[0].log.toarray(),
+                                    console: instance.sessions[0].console.toarray(),
+                                    username: instance.sessions[0].username,
+                                    connected: instance.sessions[0].connected,
+                                    restart: instance.sessions[0].restart,
+                                    options: instance.sessions[0].options
+                                })
+                            )
+                        }
+                        res.end();
+                    } else if (req.url === "/start") { //API endpoint to start queuing
+                        res.writeHead(200);
+                        res.end();
+                        instance.sessions[0].start();
+                    } else if (req.url === "/stop") { //API endpoint to stop queuing
+                        res.writeHead(200);
+                        res.end();
+                        instance.sessions[0].stop();
+                    } else if (req.url === "/restart") {
+                        if (req.headers.hasOwnProperty("xrestart")) {
+                            res.writeHead(200);
+                            instance.sessions[0].restart = (req.headers.xrestart === 'true')
+                            res.end();
+                        } else {
+                            res.writeHead(400);
+                            res.end()
+                        }
+                    } else if (req.url === "/options") {
+                        if (req.headers.hasOwnProperty("xoptions")) {
+                            res.writeHead(200);
+                            instance.sessions[0].options = JSON.parse(req.headers.xoptions)
+                            res.end();
+                        } else {
+                            res.writeHead(400);
+                            res.end()
+                        }
+                    } else if (req.url === "/send") {
+                        if (req.headers.hasOwnProperty("xchat") && req.headers.hasOwnProperty("xtext")) {
+                            if (req.headers.xchat === 'true') {
+                                instance.sessions[0].sendChat(req.headers.xtext)
+                            } else {
+                                instance.sessions[0].execConsole(req.headers.xtext)
+                            }
+                            res.writeHead(200);
+                        } else {
+                            res.writeHead(400)
+                        }
+                        res.end();
+                    } else {
+                        res.writeHead(404);
+                        res.end();
+                    }
+                } else {
+                    res.writeHead(403);
+                    res.end()
+                }
             }
         }).listen(port);
     },
-    session: null,
-    password: "" //the password to use for the webapp
+    instances: {}
 };
 
+function getInstance(user,password) {
+    let instance = module.exports.instances[user]
+    if(instance !== undefined && instance.getPassword() === password){
+        return instance
+    }else
+        return undefined
+}
