@@ -143,10 +143,10 @@ module.exports = {
                     }
                 } else if (req.url === "/send") {
                     if (req.headers.hasOwnProperty("xchat") && req.headers.hasOwnProperty("xtext")) {
-                        if (req.headers.xchat) {
+                        if (req.headers.xchat === 'true') {
                             module.exports.session.sendChat(req.headers.xtext)
                         } else {
-
+                            module.exports.session.execConsole(req.headers.xtext)
                         }
                         res.writeHead(200);
                     }else {

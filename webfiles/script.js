@@ -207,7 +207,7 @@ function updatePageComponents(req) {
                 } else {
                     Object.keys(console).forEach((key) => {
                         let value = console[key]
-                        new_html = new_html.concat("<tr><td><pre>").concat(MotdToHtml(escapeHtml(value))).concat("</pre></td></tr>")
+                        new_html = new_html.concat("<tr><td><pre>").concat(value).concat("</pre></td></tr>")
                     })
                 }
                 let element = document.getElementsByClassName("console")[0]

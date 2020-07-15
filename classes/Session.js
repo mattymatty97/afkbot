@@ -146,7 +146,15 @@ class Session{
     }
 
     execConsole(console){
-        eval(console)
+        try {
+            let result = eval(console)
+            if (result !== undefined)
+                this.console.push(result.toString())
+            else
+                this.console.push("executed: \""+console+"\"")
+        }catch (e) {
+            this.console.push("Exception: " + e.toString())
+        }
     }
 
 }
