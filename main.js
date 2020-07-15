@@ -10,6 +10,8 @@ if (config.openBrowserOnStart) {
     opn('http://localhost:' + config.ports.web); //open a browser window
 }
 
-let instance = new Instance(instances["mattymatty"])
+Object.keys(instances).forEach(key=>{
+    webserver.instances[key] = new Instance(instances[key])
+})
 
-webserver.instances["mattymatty"] = instance
+

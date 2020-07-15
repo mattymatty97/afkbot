@@ -1,18 +1,18 @@
 {
-  "mattymatty": {
-    "password": "neo",
+  "example": {
+    "password": "example",
     "sessions": [
       {
         "config": {
           "server": {
-            "ip": "blazenarchy.net",
+            "ip": "example.net",
             "port": 25565
           },
           "timeout": 20000
         },
         "secrets": {
-          "username":"mattymatty@freemails.it",
-          "password":"lol_Matty_lol1997!"
+          "username":"example",
+          "password":"example"
         }
       }
     ]
