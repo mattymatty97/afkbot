@@ -1,9 +1,9 @@
 const mineflayer = require('mineflayer');
-const webserver = require('./webserver.js'); // to serve the webserver
+const webserver = require('./webfiles/webserver.js'); // to serve the webserver
 const opn = require('opn'); //to open a browser window
-const secrets = require('./secrets.json'); // read the creds
-const config = require('./config.json'); // read the config
-const utils = require('./utils.js');
+const secrets = require('./configs/secrets.json'); // read the creds
+const config = require('./configs/config.json'); // read the config
+const utils = require('./webfiles/utils.js');
 
 webserver.createServer(config.ports.web); // create the webserver
 webserver.password = config.password
@@ -33,11 +33,14 @@ let _console = webserver.console
 
 function updateScoreboard(scoreboard, update) {
 	if(bot.scoreboard["sidebar"] === scoreboard) {
-		let scoreboard_txt = "<th><pre>" + scoreboard.title + "</pre></th>";
+		webserver.scoreboard = {};
+		webserver.scoreboard["title"]=scoreboard.title
+		webserver.scoreboard["entries"]={}
+		let scoreboard_txt = "<th><a>" +  + "</a></th>";
 		for (let item in scoreboard.items.slice(15) ) {
-			scoreboard_txt += "<tr><td><pre>" + item.name + "</pre></td><td><pre>" + item.value + "</pre></td></tr>";
+			webserver.scoreboard["entries"][item.name]=item.value;
+			/*scoreboard_txt += "<tr><td><a>" + item.name + "</a></td><td><a>" + item.value + "</a></td></tr>";*/
 		}
-		webserver.scoreboard = scoreboard_txt;
 	}else if(bot.scoreboard["list"] === scoreboard){
 		updateTablist()
 	}
@@ -45,11 +48,12 @@ function updateScoreboard(scoreboard, update) {
 
 function updateTablist() {
 	let listScore = bot.scoreboard["list"];
-	let tablist = ""
+	let tablist = {}
 	for (let pl in bot.players) {
-		tablist += "<tr><td><pre>" + utils.ChatToHtml(bot.players[pl].displayName) + "</pre></td>"
+		tablist[bot.players[pl].displayName.toMotd()] = (listScore !== undefined && listScore.itemsMap[pl] !== undefined)?listScore.itemsMap[pl].value:null
+		/*tablist += "<tr><td><pre>" + utils.ChatToHtml(bot.players[pl].displayName) + "</pre></td>"
 		tablist += (listScore !== undefined && listScore.itemsMap[pl] !== undefined)?("<td><pre style='color: #e0e01f'>"+listScore.itemsMap[pl].value+"</pre></td>"):""
-		tablist += "</tr>"
+		tablist += "</tr>"*/
 	}
 	webserver.tablist = tablist;
 }
@@ -58,7 +62,10 @@ function updateTablist() {
 function start() {
 	if ( bot === undefined ) {
 		restart = webserver.restart;
-		_log.push("<pre>Connecting to "+config.server.ip+":"+config.server.port+"</pre>")
+		_log.push({
+			text: "Connecting to "+config.server.ip+":"+config.server.port,
+			color: null
+		})
 		bot = mineflayer.createBot({
 			host: config.server.ip,
 			port: config.server.port,
@@ -67,7 +74,14 @@ function start() {
 		});
 
 		bot.on("error", (error => {
-			_log.push("<pre style='color: #f32727'>Error: </pre><br><pre>"+error+"</pre>")
+			_log.push({
+				text : "Error:",
+				color: "#f32727"
+			})
+			_log.push({
+				text : error.toString(),
+				color: null
+			})
 			webserver.isConnected = false;
 			console.log(error)
 			bot = undefined;
@@ -76,13 +90,16 @@ function start() {
 		bot.on("message",(jsonMessage)=>{
 			//const ChatMessage = require('mineflayer/lib/chat_message')(bot.version);
 			//let message = new ChatMessage(jsonMessage)
-			_chat.push("<pre>" + utils.MotdToHtml(utils.escapeHtml(jsonMessage.toMotd())) + "</pre>")
+			_chat.push(jsonMessage.toMotd())
 		})
 
 		bot.on("login", client => {
 			webserver.isConnected = true;
 			webserver.username = bot.username;
-			_log.push("<a>Connected</a>")
+			_log.push({
+				text: "Connected",
+				color: null
+			})
 		})
 
 		bot.on("spawn", updateTablist)
@@ -91,20 +108,24 @@ function start() {
 		bot.on("playerLeft",updateTablist)
 
 		bot.on("end", (ignored) => {
-			_log.push("<pre>Disconnected</pre>")
+			_log.push({
+				text: "Disconnected"
+			})
 			webserver.isConnected = false
-			webserver.tablist = webserver.scoreboard = "<tr><td><pre>Nothing to Show</pre></td></tr>";
+			webserver.tablist = webserver.scoreboard = {}
 			webserver.username = "NOT CONNECTED"
 			bot = undefined
 			if (restart){
-				_log.push("<pre>Reconnect in "+config.reconnectTimeout+" ms</pre>")
+				_log.push({
+					text: "Reconnect in " + config.reconnectTimeout + " ms"
+				})
 				setTimeout(start,config.reconnectTimeout)
 			}
 		});
 
 		bot.on("scoreboardPosition",()=>{
 			if (bot.scoreboard["sidebar"] === undefined){
-				webserver.scoreboard = "<tr><td><pre>Nothing to Show</pre></td></tr>";
+				webserver.scoreboard = {};
 			}else{
 				updateScoreboard()
 			}

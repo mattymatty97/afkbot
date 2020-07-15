@@ -61,7 +61,7 @@ typings/
 .next
 
 #secrets
-secrets.json
+configs/secrets.json
 
 #package-lock
 package-lock.json

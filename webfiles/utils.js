@@ -1,6 +1,3 @@
-const mineflayer = require('mineflayer');
-const Queue = require('queue');
-
 const codes = {
         black: '#000000',
         dark_blue: '#0000AA',
@@ -46,9 +43,7 @@ const MotdCodes = {
     'k': 'obfuscated',
     'r': 'reset'
 }
-
-module.exports = {
-    ChatToHtml: (message) => {
+function ChatToHtml(message) {
         let chatMsg = message
         let text = ""
         if(message.hasOwnProperty("translate")){
@@ -93,9 +88,9 @@ module.exports = {
             text = text.concat(tail)
         }
         return module.exports.MotdToHtml(text)
-    },
+    }
 
-    MotdToHtml: (message) =>{
+    function MotdToHtml(message) {
         let list = message.split('§')
         let text = list[0]
         let color = null;
@@ -165,15 +160,11 @@ module.exports = {
             text = text.concat(msg)
         }
         return text
-    },
-    escapeHtml: (msg) =>{
+    }
+
+    function escapeHtml (msg) {
         return msg.replace(/"/gi,"&quot;")
             .replace(/&/gi,"&amp;")
             .replace(/</gi,"&lt;")
             .replace(/>/gi,"&gt;")
     }
-}
-
-function escapeHtml(msg) {
- return module.exports.escapeHtml(msg)
-}

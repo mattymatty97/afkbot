@@ -5,7 +5,7 @@
     "openBrowserOnStart": false,
     "password":"",
     "server": {
-        "ip": "protosky.apexmc.co",
+        "ip": "blazenarchy.net",
         "port": 25565
     },
     "reconnectTimeout": 3000
