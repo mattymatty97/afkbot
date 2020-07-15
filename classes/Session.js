@@ -20,106 +20,119 @@ class Session{
     }
 
 
-    updateScoreboard(scoreboard) {
-        if(this.bot.scoreboard["sidebar"] === scoreboard) {
-            this.scoreboard = {};
-            this.scoreboard["title"]=scoreboard.title
-            this.scoreboard["entries"]={}
+    updateScoreboard(session, scoreboard) {
+        if(session.bot.scoreboard["sidebar"] === scoreboard) {
+            session.scoreboard = {};
+            session.scoreboard["title"]=scoreboard.title
+            session.scoreboard["entries"]={}
             for (let item in scoreboard.items.slice(15) ) {
-                this.scoreboard["entries"][item.name]=item.value;
+                session.scoreboard["entries"][item.name]=item.value;
             }
-        }else if(this.bot.scoreboard["list"] === scoreboard){
+        }else if(session.bot.scoreboard["list"] === scoreboard){
             this.updateTablist()
         }
     }
 
-    updateTablist() {
-        let listScore = this.bot.scoreboard["list"];
+    updateTablist(session) {
+        let listScore = session.bot.scoreboard["list"];
         let tablist = {}
-        for (let pl in this.bot.players) {
-            tablist[this.bot.players[pl].displayName.toMotd()] = (listScore !== undefined && listScore.itemsMap[pl] !== undefined)?listScore.itemsMap[pl].value:null
+        for (let pl in session.bot.players) {
+            tablist[session.bot.players[pl].displayName.toMotd()] = (listScore !== undefined && listScore.itemsMap[pl] !== undefined)?listScore.itemsMap[pl].value:null
         }
-        this.tablist = tablist;
+        session.tablist = tablist;
     }
 
     start() {
-        if ( this.bot === undefined ) {
-            this.log.push({
-                text: "Connecting to "+this.options.config.server.ip+":"+this.options.config.server.port,
+        let session = this
+        if ( session.bot === undefined ) {
+            session.log.push({
+                text: "Connecting to "+session.options.config.server.ip+":"+session.options.config.server.port,
                 color: null
             })
-            this.bot = mineflayer.createBot({
-                host: this.options.config.server.ip,
-                port: this.options.config.server.port,
-                username: this.options.secrets.username,
-                password: this.options.secrets.password
+            session.bot = mineflayer.createBot({
+                host: session.options.config.server.ip,
+                port: session.options.config.server.port,
+                username: session.options.secrets.username,
+                password: session.options.secrets.password
             });
 
-            this.bot.on("error", (error => {
-                this.log.push({
+            session.bot.on("error", (error => {
+                session.log.push({
                     text : "Error:",
                     color: "#f32727"
                 })
-                this.log.push({
+                session.log.push({
                     text : error.toString(),
                     color: null
                 })
-                this.connected = false;
+                session.connected = false;
                 console.log(error)
-                this.bot = undefined;
+                session.bot = undefined;
             }))
 
-            this.bot.on("message",(jsonMessage)=>{
+            session.bot.on("message",(jsonMessage)=>{
                 //const ChatMessage = require('mineflayer/lib/chat_message')(bot.version);
                 //let message = new ChatMessage(jsonMessage)
-                this.chat.push(jsonMessage.toMotd())
+                session.chat.push(jsonMessage.toMotd())
             })
 
-            this.bot.on("login", client => {
-                this.connected = true;
-                this.username = this.bot.username;
-                this.log.push({
+            session.bot.on("login", client => {
+                session.connected = true;
+                session.username = session.bot.username;
+                session.log.push({
                     text: "Connected",
                     color: null
                 })
             })
 
-            this.bot.on("spawn", this.updateTablist)
+            session.bot.on("spawn", ()=>{
+                session.updateTablist(session)
+            })
 
-            this.bot.on("playerJoined",this.updateTablist)
-            this.bot.on("playerLeft",this.updateTablist)
+            session.bot.on("playerJoined",()=>{
+                session.updateTablist(session)
+            })
+            session.bot.on("playerLeft",()=>{
+                session.updateTablist(session)
+            })
 
-            this.bot.on("end", (ignored) => {
-                this.log.push({
+            session.bot.on("end", (ignored) => {
+                session.log.push({
                     text: "Disconnected"
                 })
-                this.connected = false
-                this.tablist = this.scoreboard = {}
-                this.username = "NOT CONNECTED"
-                this.bot = undefined
-                if (this.restart){
-                    this.log.push({
-                        text: "Reconnect in " + this.options.config.timeout + " ms"
+                session.connected = false
+                session.tablist = session.scoreboard = {}
+                session.username = "NOT CONNECTED"
+                session.bot = undefined
+                if (session.restart){
+                    session.log.push({
+                        text: "Reconnect in " + session.options.config.timeout + " ms"
                     })
-                    setTimeout(start,this.options.config.timeout)
+                    setTimeout(start,session.options.config.timeout)
                 }
-                if(this.reset){
-                    this.reset=false
-                    this.restart=true
+                if(session.reset){
+                    session.reset=false
+                    session.restart=true
                 }
             });
 
-            this.bot.on("scoreboardPosition",()=>{
-                if (this.bot.scoreboard["sidebar"] === undefined){
-                    this.scoreboard = {};
+            session.bot.on("scoreboardPosition",(scoreboard)=>{
+                if (session.bot.scoreboard["sidebar"] === undefined){
+                    session.scoreboard = {};
                 }else{
-                    this.updateScoreboard()
+                    session.updateScoreboard(session,scoreboard)
                 }
             })
 
-            this.bot.on("scoreUpdated",this.updateScoreboard)
-            this.bot.on("scoreRemoved",this.updateScoreboard)
-            this.bot.on("scoreboardTitleChanged",this.updateScoreboard)
+            session.bot.on("scoreUpdated",(scoreboard)=>{
+                session.updateScoreboard(session,scoreboard)
+            })
+            session.bot.on("scoreRemoved",(scoreboard)=>{
+                session.updateScoreboard(session,scoreboard)
+            })
+            session.bot.on("scoreboardTitleChanged",(scoreboard)=>{
+                session.updateScoreboard(session,scoreboard)
+            })
 
         }
     }

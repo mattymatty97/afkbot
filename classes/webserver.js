@@ -79,7 +79,7 @@ module.exports = {
                             case "connected": {
                                 res.writeHead(200, {'Content-type': 'text/json'});
                                 res.write(JSON.stringify({
-                                    connected: module.exports.session.isConnected
+                                    connected: module.exports.session.connected
                                 }))
                             }
                                 break;
@@ -108,7 +108,7 @@ module.exports = {
                                 log: module.exports.session.log.toarray(),
                                 console: module.exports.session.console.toarray(),
                                 username: module.exports.session.username,
-                                connected: module.exports.session.isConnected,
+                                connected: module.exports.session.connected,
                                 restart: module.exports.session.restart,
                                 options: module.exports.session.options
                             })
@@ -126,7 +126,7 @@ module.exports = {
                 } else if (req.url === "/restart") {
                     if(req.headers.hasOwnProperty("xrestart")) {
                         res.writeHead(200);
-                        module.exports.session.restart = req.headers.XRestart
+                        module.exports.session.restart = (req.headers.xrestart === 'true')
                         res.end();
                     }else{
                         res.writeHead(400);
