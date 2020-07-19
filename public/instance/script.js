@@ -87,9 +87,9 @@ function updateComponent(target) {
             if(component['time'] !== new_time && !isNaN(new_time)){
                 component['time'] = new_time
                 console.log(target + " time: " + new_time)
-                clearInterval(component['interval'])
-                component['interval'] = setInterval(updateComponent,component['time'],target)
             }
+            clearTimeout(component['timeout'])
+            component['timeout'] = setTimeout(updateComponent,component['time'],target)
 
             component['prev'] = act
 
@@ -105,9 +105,9 @@ function resetComponentTime(target) {
     let component = components[target]
     if(component!==undefined){
         component['time'] = 1000;
-        if(component.hasOwnProperty('interval'))
-            clearInterval(component['interval'])
-        component['interval'] = setInterval(updateComponent,component['time'],target)
+        if(component.hasOwnProperty('timeout'))
+            clearInterval(component['timeout'])
+        component['timeout'] = setTimeout(updateComponent,component['time'],target)
     }
 }
 
@@ -128,9 +128,9 @@ function updateAll() {
                 component['prev'] = null
                 component['time'] = 1000
                 console.log(key + " time: " + 1000)
-                if(component.hasOwnProperty('interval'))
-                    clearInterval(component['interval'])
-                component['interval'] = setInterval(updateComponent,component['time'],key)
+                if(component.hasOwnProperty('timeout'))
+                    clearTimeout(component['timeout'])
+                component['timeout'] = setTimeout(updateComponent,component['time'],key)
 
                 components[key] = component
 
