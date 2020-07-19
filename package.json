@@ -10,6 +10,8 @@
   "author": "",
   "dependencies": {
     "circular-buffer": "^1.0.2",
+    "express": "^4.17.1",
+    "express-path": "^0.3.8",
     "minecraft-protocol": "^1.8.3",
     "mineflayer": "^2.23.0",
     "opn": "^6.0.0",

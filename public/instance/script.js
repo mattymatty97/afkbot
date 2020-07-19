@@ -1,4 +1,4 @@
-setInterval(updateAll, 1000);
+updateAll()
 
 function logout() {
     document.cookie = "user="
@@ -11,6 +11,7 @@ function start() {
     xhr.open("GET", "/start", true);
     setHeaders(xhr)
     xhr.send();
+    updateAll()
 }
 
 function stop() {
@@ -18,6 +19,7 @@ function stop() {
     xhr.open("GET", "/stop", true);
     setHeaders(xhr)
     xhr.send();
+    updateAll()
 }
 
 function toggleRestartQueue() {
@@ -36,6 +38,8 @@ function sendChat() {
     xhr.setRequestHeader('XText', document.getElementsByClassName('chatInput')[0].value)
     xhr.send();
     document.getElementsByClassName('chatInput')[0].value = ""
+    resetComponentTime('chat')
+    updateComponent('chat')
 }
 
 function sendConsole() {
@@ -46,69 +50,94 @@ function sendConsole() {
     xhr.setRequestHeader('XText', document.getElementsByClassName('consoleInput')[0].value)
     xhr.send();
     document.getElementsByClassName('consoleInput')[0].value = ""
+    resetComponentTime('console')
+    updateComponent('console')
 }
 
-function updateTabList() {
+let components = {
+    min_time: 20,
+    max_time: 20000
+}
+
+function updateComponent(target) {
     const xhr = new XMLHttpRequest();
     xhr.open("GET", "/update", true);
-    xhr.setRequestHeader('XTarget', "tablist")
-    xhr.onreadystatechange = function () {
-        updatePageComponents(this)
+    xhr.setRequestHeader('xtarget',target)
+    xhr.onreadystatechange =  () => {
+        updatePageComponents(xhr)
+
+        if (xhr.readyState === 4 && xhr.status === 200) {
+            const response = JSON.parse(xhr.responseText);
+
+            let component = components[target]
+
+            let act = false
+            let string = JSON.stringify(response[target])
+            let new_time = component['time']
+            if(component['old'] !== string){
+                act = true
+                component['old'] = string
+            }
+            if(component['prev'] !== null)
+                if(act && component['prev']){
+                     new_time = Math.max(new_time/2,components.min_time)
+                }else if(!act && !component['prev']){
+                     new_time = Math.min(new_time*2,components.max_time)
+                }
+            if(component['time'] !== new_time && !isNaN(new_time)){
+                component['time'] = new_time
+                console.log(target + " time: " + new_time)
+                clearInterval(component['interval'])
+                component['interval'] = setInterval(updateComponent,component['time'],target)
+            }
+
+            component['prev'] = act
+
+            components[target] = component
+
+        }
     }
     setHeaders(xhr)
     xhr.send();
 }
 
-function updateScoreboard() {
-    const xhr = new XMLHttpRequest();
-    xhr.open("GET", "/update", true);
-    xhr.setRequestHeader('XTarget', "scoreboard")
-    xhr.onreadystatechange = updatePageComponents()
-    setHeaders(xhr)
-    xhr.send();
-}
-
-function updateChat() {
-    const xhr = new XMLHttpRequest();
-    xhr.open("GET", "/update", true);
-    xhr.setRequestHeader('XTarget', "chat")
-    xhr.onreadystatechange = updatePageComponents()
-    setHeaders(xhr)
-    xhr.send();
-}
-
-function updateLog() {
-    const xhr = new XMLHttpRequest();
-    xhr.open("GET", "/update", true);
-    xhr.setRequestHeader('XTarget', "log")
-    xhr.onreadystatechange = updatePageComponents()
-    setHeaders(xhr)
-    xhr.send();
-}
-
-function updateConsole() {
-    const xhr = new XMLHttpRequest();
-    xhr.open("GET", "/update", true);
-    xhr.setRequestHeader('XTarget', "console")
-    xhr.onreadystatechange = updatePageComponents()
-    setHeaders(xhr)
-    xhr.send();
-}
-
-function updateOptions() {
-    const xhr = new XMLHttpRequest();
-    xhr.open("GET", "/update", true);
-    xhr.setRequestHeader('XTarget', "options")
-    xhr.onreadystatechange = updatePageComponents()
-    setHeaders(xhr)
-    xhr.send();
+function resetComponentTime(target) {
+    let component = components[target]
+    if(component!==undefined){
+        component['time'] = 1000;
+        if(component.hasOwnProperty('interval'))
+            clearInterval(component['interval'])
+        component['interval'] = setInterval(updateComponent,component['time'],target)
+    }
 }
 
 function updateAll() {
     const xhr = new XMLHttpRequest();
     xhr.open("GET", "/update", true);
     xhr.onreadystatechange = function () {
-        updatePageComponents(this)
+        updatePageComponents(this);
+
+        if (this.readyState === 4 && this.status === 200) {
+            const response = JSON.parse(this.responseText);
+
+            Object.keys(response).forEach(key=>{
+
+                let component = components[key] || {}
+
+                component['old'] = JSON.stringify(response[key])
+                component['prev'] = null
+                component['time'] = 1000
+                console.log(key + " time: " + 1000)
+                if(component.hasOwnProperty('interval'))
+                    clearInterval(component['interval'])
+                component['interval'] = setInterval(updateComponent,component['time'],key)
+
+                components[key] = component
+
+            })
+
+        }
+
     }
     setHeaders(xhr)
     xhr.send();
@@ -177,7 +206,7 @@ function updatePageComponents(req) {
                     new_html = ""
                 } else {
                     Object.keys(chat).forEach((key) => {
-                        let value = chat[key]
+                        let value = chat[key].text
                         if (typeof (value) === "string")
                             new_html = new_html.concat("<tr><td><pre>").concat(MotdToHtml(escapeHtml(value))).concat("</pre></td></tr>")
                     })
@@ -196,7 +225,9 @@ function updatePageComponents(req) {
                 } else {
                     Object.keys(log).forEach((key) => {
                         let value = log[key]
-                        new_html = new_html.concat("<tr><td><pre>").concat(value.text).concat("</pre></td></tr>")
+                        let time = value.timestamp
+                        let date = Date(time)
+                        new_html = new_html.concat("<tr><td><pre>[").concat(date.toDateString()).concat("] ").concat(value.text).concat("</pre></td></tr>")
                     })
                 }
                 let element = document.getElementsByClassName("log")[0]
@@ -225,7 +256,7 @@ function updatePageComponents(req) {
             parseOptions(response);
         }
         if (response.hasOwnProperty("username")) {
-            let username = response.username
+            let username = response.username.value
             if(old_uname !== username) {
                 let element = document.getElementsByClassName("uname")[0]
                 element.innerHTML = username;
@@ -233,14 +264,14 @@ function updatePageComponents(req) {
             }
         }
         if (response.hasOwnProperty("restart")) {
-            let restart = response.restart
+            let restart = response.restart.value
             let element = document.getElementsByClassName("restart")[0]
             if (element.checked !== restart)
                 element.checked = restart;
         }
         if (response.hasOwnProperty("connected")) {
             let mainButton = document.getElementById('mainButton');
-            if (response.connected) {
+            if (response.connected.value) {
                 mainButton.innerHTML = "Disconnect";
                 mainButton.setAttribute('onclick', 'stop()');
                 mainButton.className = 'stop';
@@ -297,29 +328,26 @@ function makeInput(value,key) {
 }
 
 function updateOpt(id) {
-    let new_opt = JSON.parse(JSON.stringify(old_options))
+    let json = {
+        path: id
+    }
+
     let element = document.getElementById(id)
-    set(new_opt,id,element.value)
+    if(element.type === 'number'){
+        json['value'] = Number(element.value)
+    }else if(element.type === 'checkbox'){
+        json['value'] = Boolean(element.value)
+    }else{
+        json['value'] = element.value
+    }
 
     let xhr = new XMLHttpRequest();
-    xhr.open("GET", "/options", true);
+    xhr.open("GET", "/option", true);
     setHeaders(xhr)
-    xhr.setRequestHeader('XOptions', JSON.stringify(new_opt))
+    xhr.setRequestHeader('XOption', JSON.stringify(json))
     xhr.send();
 }
 
-function set(obj, path, value) {
-    var schema = obj;  // a moving reference to internal objects within obj
-    var pList = path.split('.');
-    var len = pList.length;
-    for(var i = 0; i < len-1; i++) {
-        var elem = pList[i];
-        if( !schema[elem] ) schema[elem] = {}
-        schema = schema[elem];
-    }
-
-    schema[pList[len-1]] = value;
-}
 
 function setHeaders(req) {
     req.setRequestHeader('XPassword', getCookie("password"))

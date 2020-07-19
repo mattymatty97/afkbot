@@ -51,6 +51,9 @@ class Session{
         let onTabList = ()=>{
             this.updateTablist()
         }
+        let onRestart = ()=>{
+            this.start()
+        }
         if ( session.bot === undefined ) {
             session.log.push({
                 text: "Connecting to "+session.options.config.server.ip+":"+session.options.config.server.port,
@@ -107,7 +110,7 @@ class Session{
                     session.log.push({
                         text: "Reconnect in " + session.options.config.timeout + " ms"
                     })
-                    setTimeout(start,session.options.config.timeout)
+                    setTimeout(onRestart,session.options.config.timeout)
                 }
                 if(session.reset){
                     session.reset=false
