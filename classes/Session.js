@@ -57,7 +57,8 @@ class Session{
         if ( session.bot === undefined ) {
             session.log.push({
                 text: "Connecting to "+session.options.config.server.ip+":"+session.options.config.server.port,
-                color: null
+                color: null,
+                timestamp: Date.now()
             })
             session.bot = mineflayer.createBot({
                 host: session.options.config.server.ip,
@@ -69,11 +70,13 @@ class Session{
             session.bot.on("error", (error => {
                 session.log.push({
                     text : "Error:",
-                    color: "#f32727"
+                    color: "#f32727",
+                    timestamp: Date.now()
                 })
                 session.log.push({
                     text : error.toString(),
-                    color: null
+                    color: null,
+                    timestamp: Date.now()
                 })
                 session.connected = false;
                 console.log(error)
@@ -81,7 +84,10 @@ class Session{
             }))
 
             session.bot.on("message",(jsonMessage)=>{
-                session.chat.push(jsonMessage.toMotd())
+                session.chat.push({
+                    text: jsonMessage.toMotd(),
+                    timestamp: Date.now()
+                })
             })
 
             session.bot.on("login", () => {
@@ -89,7 +95,8 @@ class Session{
                 session.username = session.bot.username;
                 session.log.push({
                     text: "Connected",
-                    color: null
+                    color: null,
+                    timestamp: Date.now()
                 })
             })
 
@@ -100,7 +107,8 @@ class Session{
 
             session.bot.on("end", () => {
                 session.log.push({
-                    text: "Disconnected"
+                    text: "Disconnected",
+                    timestamp: Date.now()
                 })
                 session.connected = false
                 session.tablist = session.scoreboard = {}
@@ -108,7 +116,8 @@ class Session{
                 session.bot = undefined
                 if (session.restart){
                     session.log.push({
-                        text: "Reconnect in " + session.options.config.timeout + " ms"
+                        text: "Reconnect in " + session.options.config.timeout + " ms",
+                        timestamp: Date.now()
                     })
                     setTimeout(onRestart,session.options.config.timeout)
                 }

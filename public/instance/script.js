@@ -207,8 +207,10 @@ function updatePageComponents(req) {
                 } else {
                     Object.keys(chat).forEach((key) => {
                         let value = chat[key].text
+                        let time = chat[key].timestamp
+                        let date = new Date(time)
                         if (typeof (value) === "string")
-                            new_html = new_html.concat("<tr><td><pre>").concat(MotdToHtml(escapeHtml(value))).concat("</pre></td></tr>")
+                            new_html = new_html.concat("<tr><td><pre>[").concat(date.toLocaleTimeString()).concat("] ").concat(MotdToHtml(escapeHtml(value))).concat("</pre></td></tr>")
                     })
                 }
                 let element = document.getElementsByClassName("chat")[0]
@@ -226,8 +228,8 @@ function updatePageComponents(req) {
                     Object.keys(log).forEach((key) => {
                         let value = log[key]
                         let time = value.timestamp
-                        let date = Date(time)
-                        new_html = new_html.concat("<tr><td><pre>[").concat(date.toDateString()).concat("] ").concat(value.text).concat("</pre></td></tr>")
+                        let date = new Date(time)
+                        new_html = new_html.concat("<tr><td><pre>[").concat(date.toLocaleTimeString()).concat("] ").concat(value.text).concat("</pre></td></tr>")
                     })
                 }
                 let element = document.getElementsByClassName("log")[0]
