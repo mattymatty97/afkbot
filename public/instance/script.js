@@ -22,11 +22,18 @@ function stop() {
     updateAll()
 }
 
-function toggleRestartQueue() {
+function toggleRestart() {
     const xhr = new XMLHttpRequest();
     xhr.open("GET", "/restart", true);
     setHeaders(xhr)
     xhr.setRequestHeader('XRestart', document.getElementsByClassName('restart')[0].checked)
+    xhr.send();
+}
+function toggleDisconnect() {
+    const xhr = new XMLHttpRequest();
+    xhr.open("GET", "/disconnect", true);
+    setHeaders(xhr)
+    xhr.setRequestHeader('XDisconnect', document.getElementsByClassName('disconnect')[0].checked)
     xhr.send();
 }
 
@@ -210,7 +217,7 @@ function updatePageComponents(req) {
                         let time = chat[key].timestamp
                         let date = new Date(time)
                         if (typeof (value) === "string")
-                            new_html = new_html.concat("<tr><td><pre>[").concat(date.toLocaleTimeString()).concat("] ").concat(MotdToHtml(escapeHtml(value))).concat("</pre></td></tr>")
+                            new_html = new_html.concat("<tr><td><pre>[").concat(date.toLocaleTimeString()).concat("] ").concat(MotdToHtml(value)).concat("</pre></td></tr>")
                     })
                 }
                 let element = document.getElementsByClassName("chat")[0]
@@ -270,6 +277,12 @@ function updatePageComponents(req) {
             let element = document.getElementsByClassName("restart")[0]
             if (element.checked !== restart)
                 element.checked = restart;
+        }
+        if (response.hasOwnProperty("disconnect")) {
+            let disconnect = response.disconnect.value
+            let element = document.getElementsByClassName("disconnect")[0]
+            if (element.checked !== disconnect)
+                element.checked = disconnect;
         }
         if (response.hasOwnProperty("connected")) {
             let mainButton = document.getElementById('mainButton');

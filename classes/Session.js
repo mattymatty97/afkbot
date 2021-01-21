@@ -5,9 +5,11 @@ class Session{
 
     constructor(options) {
         this.options = options
+        this.botOptions = {};
         this.bot = undefined; // the client to connect
 
         this.restart = false;
+        this.disconnect = false;
 
         this.chat = new CircularBuffer(70)
         this.log = new CircularBuffer(100)
@@ -60,12 +62,23 @@ class Session{
                 color: null,
                 timestamp: Date.now()
             })
-            session.bot = mineflayer.createBot({
-                host: session.options.config.server.ip,
-                port: session.options.config.server.port,
-                username: session.options.secrets.username,
-                password: session.options.secrets.password
-            });
+
+            this.botOptions['host']=session.options.config.server.ip
+            this.botOptions['port']=session.options.config.server.port
+
+            if(this.botOptions['username']!==session.options.config.secrets.username){
+                this.botOptions['username']=session.options.config.secrets.username;
+                delete this.botOptions['clientToken']
+                delete this.botOptions['accessToken']
+            }
+
+            if(this.botOptions['password']!==session.options.config.secrets.password){
+                this.botOptions['password']=session.options.config.secrets.password;
+                delete this.botOptions['clientToken']
+                delete this.botOptions['accessToken']
+            }
+
+            session.bot = mineflayer.createBot(this.botOptions);
 
             session.bot.on("error", (error => {
                 session.log.push({
@@ -105,6 +118,11 @@ class Session{
             session.bot.on("playerJoined",onTabList)
             session.bot.on("playerLeft",onTabList)
 
+            session.bot.on('death',()=>{
+                if(this.disconnect)
+                    this.stop("Death");
+            })
+
             session.bot.on("end", () => {
                 session.log.push({
                     text: "Disconnected",
@@ -142,13 +160,13 @@ class Session{
         }
     }
 
-    stop(){
+    stop(reason="Button"){
         this.connected = false;
         if (this.restart) {
             this.reset = true;
             this.restart = false;
         }
-        this.bot.quit("Button");
+        this.bot.quit(reason);
     }
 
     sendChat(msg){

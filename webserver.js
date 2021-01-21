@@ -1,5 +1,8 @@
 //this module exposes functions and variables to control the HTTP server.
 const express = require('express')
+const https = require('https');
+const http = require('http');
+const fs = require('fs');
 
 module.exports = {
     createServer: (port) => {
@@ -42,6 +45,19 @@ module.exports = {
                     if(req.headers.hasOwnProperty('xrestart')) {
                         res.writeHead(200)
                         instance.sessions[0].restart = (req.headers.xrestart === 'true')
+                    }else
+                        res.writeHead(400)
+                }else{
+                    res.writeHead(401)
+                }
+                res.end();
+        })
+        app.get('/disconnect',function (req,res) {
+                let instance = getInstance(req.headers.xuser,req.headers.xpassword)
+                if(instance !== undefined){
+                    if(req.headers.hasOwnProperty('xdisconnect')) {
+                        res.writeHead(200)
+                        instance.sessions[0].disconnect = (req.headers.xdisconnect === 'true')
                     }else
                         res.writeHead(400)
                 }else{
@@ -104,7 +120,22 @@ module.exports = {
                 res.end();
         })
 
-        app.listen(port)
+
+
+        let webserver;
+
+        try {
+            let privateKey = fs.readFileSync('config/privkey.pem');
+            let certificate = fs.readFileSync('config/cert.pem');
+            let options = {key: privateKey, cert: certificate};
+
+            webserver = https.createServer(options, app);
+        }catch (err){
+            webserver = http.createServer(app);
+        }finally {
+            webserver.listen(port)
+        }
+
     },
     instances: {}
 };
@@ -129,6 +160,7 @@ function getUpdate(instance) {
         username: { value: instance.sessions[0].username },
         connected: { value: instance.sessions[0].connected },
         restart: { value: instance.sessions[0].restart },
+        disconnect: { value: instance.sessions[0].disconnect },
         options: instance.sessions[0].options
     }
 }

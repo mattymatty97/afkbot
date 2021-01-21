@@ -1,6 +1,5 @@
 {
     "ports":{
         "web":8080
-    },
-    "openBrowserOnStart": false
+    }
 }

@@ -1,20 +1,21 @@
 {
-  "name": "not_ready",
+  "name": "nope",
   "version": "1.0.0",
   "description": "",
   "main": "main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node main.js"
+    "start": "node --harmony main.js"
   },
   "author": "",
+  "engines": {
+    "node": ">=12.19.0"
+  },
   "dependencies": {
-    "circular-buffer": "^1.0.2",
+    "circular-buffer": "^1.0.3",
     "express": "^4.17.1",
     "express-path": "^0.3.8",
-    "minecraft-protocol": "^1.8.3",
-    "mineflayer": "^2.23.0",
-    "opn": "^6.0.0",
-    "queue": "^6.0.1"
+    "minecraft-protocol": "^1.22.0",
+    "mineflayer": "^2.40.1",
+    "queue": "^6.0.2"
   }
 }
