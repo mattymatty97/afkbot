@@ -66,14 +66,14 @@ class Session{
             this.botOptions['host']=session.options.config.server.ip
             this.botOptions['port']=session.options.config.server.port
 
-            if(this.botOptions['username']!==session.options.config.secrets.username){
-                this.botOptions['username']=session.options.config.secrets.username;
+            if(this.botOptions['username'] !== session.options.secrets.username){
+                this.botOptions['username']=session.options.secrets.username;
                 delete this.botOptions['clientToken']
                 delete this.botOptions['accessToken']
             }
 
-            if(this.botOptions['password']!==session.options.config.secrets.password){
-                this.botOptions['password']=session.options.config.secrets.password;
+            if(this.botOptions['password']!==session.options.secrets.password){
+                this.botOptions['password']=session.options.secrets.password;
                 delete this.botOptions['clientToken']
                 delete this.botOptions['accessToken']
             }

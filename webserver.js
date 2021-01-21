@@ -125,12 +125,13 @@ module.exports = {
         let webserver;
 
         try {
-            let privateKey = fs.readFileSync('config/privkey.pem');
-            let certificate = fs.readFileSync('config/cert.pem');
+            let privateKey = fs.readFileSync('configs/privkey.pem');
+            let certificate = fs.readFileSync('configs/cert.pem');
             let options = {key: privateKey, cert: certificate};
 
             webserver = https.createServer(options, app);
         }catch (err){
+            console.log(err);
             webserver = http.createServer(app);
         }finally {
             webserver.listen(port)
