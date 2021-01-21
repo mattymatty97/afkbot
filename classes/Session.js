@@ -94,6 +94,8 @@ class Session{
                 session.connected = false;
                 console.log(error)
                 session.bot = undefined;
+                delete this.botOptions['clientToken']
+                delete this.botOptions['accessToken']
             }))
 
             session.bot.on("message",(jsonMessage)=>{
