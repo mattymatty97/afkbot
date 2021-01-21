@@ -3,12 +3,12 @@ updateAll()
 function logout() {
     document.cookie = "user="
     document.cookie = "password="
-    window.location.href = window.location.href.replace("/instance","/")
+    window.location.href = window.location.origin
 }
 
 function start() {
     const xhr = new XMLHttpRequest();
-    xhr.open("GET", "/start", true);
+    xhr.open("GET", window.location.origin + "/start", true);
     setHeaders(xhr)
     xhr.send();
     updateAll()
@@ -16,7 +16,7 @@ function start() {
 
 function stop() {
     const xhr = new XMLHttpRequest();
-    xhr.open("GET", "/stop", true);
+    xhr.open("GET", window.location.origin + "/stop", true);
     setHeaders(xhr)
     xhr.send();
     updateAll()
@@ -24,14 +24,14 @@ function stop() {
 
 function toggleRestart() {
     const xhr = new XMLHttpRequest();
-    xhr.open("GET", "/restart", true);
+    xhr.open("GET", window.location.origin + "/restart", true);
     setHeaders(xhr)
     xhr.setRequestHeader('XRestart', document.getElementsByClassName('restart')[0].checked)
     xhr.send();
 }
 function toggleDisconnect() {
     const xhr = new XMLHttpRequest();
-    xhr.open("GET", "/disconnect", true);
+    xhr.open("GET", window.location.origin + "/disconnect", true);
     setHeaders(xhr)
     xhr.setRequestHeader('XDisconnect', document.getElementsByClassName('disconnect')[0].checked)
     xhr.send();
@@ -39,7 +39,7 @@ function toggleDisconnect() {
 
 function sendChat() {
     const xhr = new XMLHttpRequest();
-    xhr.open("GET", "/send", true);
+    xhr.open("GET", window.location.origin + "/send", true);
     setHeaders(xhr)
     xhr.setRequestHeader('XChat', true)
     xhr.setRequestHeader('XText', document.getElementsByClassName('chatInput')[0].value)
@@ -51,7 +51,7 @@ function sendChat() {
 
 function sendConsole() {
     const xhr = new XMLHttpRequest();
-    xhr.open("GET", "/send", true);
+    xhr.open("GET", window.location.origin + "/send", true);
     setHeaders(xhr)
     xhr.setRequestHeader('XChat', false)
     xhr.setRequestHeader('XText', document.getElementsByClassName('consoleInput')[0].value)
@@ -68,7 +68,7 @@ let components = {
 
 function updateComponent(target) {
     const xhr = new XMLHttpRequest();
-    xhr.open("GET", "/update", true);
+    xhr.open("GET", window.location.origin + "/update", true);
     xhr.setRequestHeader('xtarget',target)
     xhr.onreadystatechange =  () => {
         updatePageComponents(xhr)
@@ -120,7 +120,7 @@ function resetComponentTime(target) {
 
 function updateAll() {
     const xhr = new XMLHttpRequest();
-    xhr.open("GET", "/update", true);
+    xhr.open("GET", window.location.origin + "/update", true);
     xhr.onreadystatechange = function () {
         updatePageComponents(this);
 
@@ -357,7 +357,7 @@ function updateOpt(id) {
     }
 
     let xhr = new XMLHttpRequest();
-    xhr.open("GET", "/option", true);
+    xhr.open("GET", window.location.origin + "/option", true);
     setHeaders(xhr)
     xhr.setRequestHeader('XOption', JSON.stringify(json))
     xhr.send();
