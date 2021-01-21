@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "circular-buffer": "^1.0.3",
+    "cookie-parser": "^1.4.5",
     "express": "^4.17.1",
     "express-path": "^0.3.8",
     "minecraft-protocol": "^1.22.0",
