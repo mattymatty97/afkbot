@@ -1,5 +1,7 @@
 const CircularBuffer = require('circular-buffer');
 const mineflayer = require('mineflayer');
+const { pathfinder, Movements } = require('mineflayer-pathfinder');
+const { GoalNear, GoalBlock, GoalXZ, GoalY, GoalInvert, GoalFollow } = require('mineflayer-pathfinder').goals;
 
 class Session{
 
@@ -82,13 +84,8 @@ class Session{
 
             session.bot.on("error", (error => {
                 session.log.push({
-                    text : "Error:",
-                    color: "#f32727",
-                    timestamp: Date.now()
-                })
-                session.log.push({
                     text : error.toString(),
-                    color: null,
+                    color: "#f32727",
                     timestamp: Date.now()
                 })
                 session.connected = false;
@@ -97,6 +94,8 @@ class Session{
                 delete this.botOptions['clientToken']
                 delete this.botOptions['accessToken']
             }))
+
+            session.bot.loadPlugin(pathfinder);
 
             session.bot.on("message",(jsonMessage)=>{
                 session.chat.push({
@@ -115,7 +114,12 @@ class Session{
                 })
             })
 
-            session.bot.on("spawn", onTabList)
+            session.bot.on("spawn", onTabList);
+            session.bot.on("spawn", ()=>{
+                const mcData = require('minecraft-data')(session.bot.version);
+                const defaultMove = new Movements(session.bot, mcData);
+                session.bot.pathfinder.setMovements(defaultMove);
+            });
 
             session.bot.on("playerJoined",onTabList)
             session.bot.on("playerLeft",onTabList)
@@ -158,6 +162,33 @@ class Session{
             session.bot.on("scoreUpdated",onScoreBaord)
             session.bot.on("scoreRemoved",onScoreBaord)
             session.bot.on("scoreboardTitleChanged",onScoreBaord)
+
+            this.pushFunc = (entity)=>{
+                if(entity.id!==session.bot.entity.id){
+                    if(Math.abs(entity.position.x - session.bot.entity.position.x) < 1 )
+                        if(Math.abs(entity.position.z - session.bot.entity.position.z) < 1 )
+                            if(Math.sqrt(Math.pow(entity.position.x - session.bot.entity.position.x,2) + Math.pow(entity.position.z - session.bot.entity.position.z,2)) < 1 )
+                            {
+                                let dx = session.bot.entity.position.x - entity.position.x ;
+                                let dz = session.bot.entity.position.z - entity.position.z ;
+                                let velx = Math.sign(dx) * 0.001;
+                                let velz = Math.sign(dz) * 0.001;
+
+                                session.bot.entity.velocity.x += velx;
+                                session.bot.entity.velocity.z += velz;
+                                /*
+                                session.log.push({
+                                    text: "Pushed by entity: "+ entity.id,
+                                    color: "#e75e00",
+                                    timestamp: Date.now()
+                                })*/
+                                
+                                setTimeout(()=>session.pushFunc(entity),500);
+                            }
+                }
+            };
+
+            session.bot.on('entityMoved',session.pushFunc);
 
         }
     }

@@ -236,7 +236,7 @@ function updatePageComponents(req) {
                         let value = log[key]
                         let time = value.timestamp
                         let date = new Date(time)
-                        new_html = new_html.concat("<tr><td><pre>[").concat(date.toLocaleTimeString()).concat("] ").concat(value.text).concat("</pre></td></tr>")
+                        new_html = new_html.concat("<tr><td><pre").concat((value.color!==null)?" style=\"color:"+value.color+";\"":"").concat(">[").concat(date.toLocaleTimeString()).concat("] ").concat(value.text).concat("</pre></td></tr>")
                     })
                 }
                 let element = document.getElementsByClassName("log")[0]
@@ -333,8 +333,8 @@ function makeInput(value,key) {
     switch (typeof value) {
         case "string":
             if(key.includes("password"))
-                return "<input id='"+key+"' type='password' value='"+value+"' onchange='updateOpt(\""+key+"\")'>"
-            return "<input id='"+key+"' type='text' value='"+value+"' onchange='updateOpt(\""+key+"\")'>"
+                return "<input id='"+key+"' type='password' value='"+value+"' onchange='updateOpt(\""+key+"\")' autocomplete=\"off\" readonly onfocus=\"this.removeAttribute('readonly')\" >"
+            return "<input id='"+key+"' type='text' value='"+value+"' onchange='updateOpt(\""+key+"\")' "+(key.includes("username")?"autocomplete=\"off\" readonly onfocus=\"this.removeAttribute('readonly')\"":"")+" >"
         case "boolean":
             return "<input id='"+key+"' type='checkbox' checked='"+value+"' onchange='updateOpt(\""+key+"\")'>"
         case "number":
