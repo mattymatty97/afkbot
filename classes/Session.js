@@ -10,6 +10,8 @@ class Session{
         this.botOptions = {};
         this.bot = undefined; // the client to connect
 
+        this.canvas = null;
+
         this.restart = false;
         this.disconnect = false;
 
@@ -164,27 +166,30 @@ class Session{
             session.bot.on("scoreboardTitleChanged",onScoreBaord)
 
             this.pushFunc = (entity)=>{
-                if(entity.id!==session.bot.entity.id){
-                    if(Math.abs(entity.position.x - session.bot.entity.position.x) < 1 )
-                        if(Math.abs(entity.position.z - session.bot.entity.position.z) < 1 )
-                            if(Math.sqrt(Math.pow(entity.position.x - session.bot.entity.position.x,2) + Math.pow(entity.position.z - session.bot.entity.position.z,2)) < 1 )
-                            {
-                                let dx = session.bot.entity.position.x - entity.position.x ;
-                                let dz = session.bot.entity.position.z - entity.position.z ;
-                                let velx = Math.sign(dx) * 0.001;
-                                let velz = Math.sign(dz) * 0.001;
+                if(session.bot !== undefined) {
+                    if (entity.id !== session.bot.entity.id) {
+                        if (Math.abs(entity.position.x - session.bot.entity.position.x) < 1)
+                            if (Math.abs(entity.position.z - session.bot.entity.position.z) < 1)
+                                if (Math.sqrt(Math.pow(entity.position.x - session.bot.entity.position.x, 2) + Math.pow(entity.position.z - session.bot.entity.position.z, 2)) < 0.8) {
+                                    let dx = session.bot.entity.position.x - entity.position.x;
+                                    let dz = session.bot.entity.position.z - entity.position.z;
+                                    let normalize = Math.sqrt(Math.pow(dx, 2) + Math.pow(dz, 2));
+                                    let velx = (dx / normalize) * 0.001;
+                                    let velz = (dz / normalize) * 0.001;
 
-                                session.bot.entity.velocity.x += velx;
-                                session.bot.entity.velocity.z += velz;
-                                /*
-                                session.log.push({
-                                    text: "Pushed by entity: "+ entity.id,
-                                    color: "#e75e00",
-                                    timestamp: Date.now()
-                                })*/
-                                
-                                setTimeout(()=>session.pushFunc(entity),500);
-                            }
+                                    session.bot.entity.velocity.x += velx;
+                                    session.bot.entity.velocity.z += velz;
+
+                                    /*
+                                    session.log.push({
+                                        text: "Pushed by entity: "+ entity.id,
+                                        color: "#e75e00",
+                                        timestamp: Date.now()
+                                    })*/
+
+                                    setTimeout(() => session.pushFunc(entity), 500);
+                                }
+                    }
                 }
             };
 
@@ -194,12 +199,14 @@ class Session{
     }
 
     stop(reason="Button"){
-        this.connected = false;
-        if (this.restart) {
-            this.reset = true;
-            this.restart = false;
+        if(this.bot !== undefined) {
+            this.connected = false;
+            if (this.restart) {
+                this.reset = true;
+                this.restart = false;
+            }
+            this.bot.quit(reason);
         }
-        this.bot.quit(reason);
     }
 
     sendChat(msg){
@@ -219,6 +226,7 @@ class Session{
             this.console.push("Exception: " + e.toString())
         }
     }
+
 
 }
 
