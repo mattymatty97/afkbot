@@ -15,6 +15,7 @@
     "audit": "0.0.6",
     "circular-buffer": "^1.0.3",
     "cookie-parser": "^1.4.5",
+    "defaults-deep": "^0.2.4",
     "express": "^4.17.1",
     "express-path": "^0.3.8",
     "fix": "0.0.6",
