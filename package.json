@@ -11,6 +11,7 @@
     "node": ">=12.19.0"
   },
   "dependencies": {
+    "assign-deep": "^1.0.1",
     "audit": "0.0.6",
     "circular-buffer": "^1.0.3",
     "cookie-parser": "^1.4.5",

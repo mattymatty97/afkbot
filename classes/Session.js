@@ -8,9 +8,7 @@ class Session{
     constructor(options) {
         this.options = options
         this.botOptions = {};
-        this.bot = undefined; // the client to connect
-
-        this.canvas = null;
+        this.bot = undefined;
 
         this.restart = false;
         this.disconnect = false;
@@ -52,10 +50,12 @@ class Session{
     start() {
         let session = this
         let onScoreBaord = (scoreboard)=>{
-            this.updateScoreboard(scoreboard)
+            if(this.bot !== undefined)
+                this.updateScoreboard(scoreboard)
         }
         let onTabList = ()=>{
-            this.updateTablist()
+            if(this.bot !== undefined)
+                this.updateTablist()
         }
         let onRestart = ()=>{
             this.start()
