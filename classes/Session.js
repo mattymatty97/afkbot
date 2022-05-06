@@ -114,13 +114,19 @@ class Session{
                     color: null,
                     timestamp: Date.now()
                 })
+				this.bot.physicsEnabled = (this.bot.gamemode == 'spectator');
             })
 
+            session.bot.on("game", ()=>{
+					this.bot.physicsEnabled = (this.bot.gamemode == 'spectator');
+			});
+			
             session.bot.on("spawn", onTabList);
             session.bot.on("spawn", ()=>{
                 const mcData = require('minecraft-data')(session.bot.version);
                 const defaultMove = new Movements(session.bot, mcData);
                 session.bot.pathfinder.setMovements(defaultMove);
+
             });
 
             session.bot.on("playerJoined",onTabList)
